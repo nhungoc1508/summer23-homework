@@ -116,6 +116,13 @@ Bool-rec a1 a2 true = a1
 Bool-rec a1 a2 false = a2
 ```
 
+```
+and' : Bool → (Bool → Bool)
+and' = Bool-rec id (const false)
+-- and′ true x = Bool-rec id (const false) true x = id x = x
+-- and′ false x = Bool-rec id (const false) false x = const false = false
+```
+
 The recursion principle for Booleans is known under a more common
 name: the "if-then-else" pattern familiar in many programming
 languages:
@@ -193,10 +200,34 @@ numbers:
 _+_ : ℕ → ℕ → ℕ
 zero    + m = m
 (suc n) + m = suc (n + m)
+-- 3 + 4 = (suc suc suc zero) + 4
+-- = suc suc (suc zero + 4)
+-- = suc suc suc (zero + 4)
+-- = suc suc suc 4 = ... = 7
 
 _·_ : ℕ → ℕ → ℕ
 -- Exercise:
-n · m = {!!}
+zero · m = zero
+(suc n) · m = n · m + m
+```
+
+```
+-- Exponent
+exp : ℕ → ℕ → ℕ
+exp _ zero = suc zero
+exp n (suc m) = (exp n m) · n
+
+-- Max
+max : ℕ → ℕ → ℕ
+max zero m = m
+max (suc n) zero = suc n
+max (suc n) (suc m) = suc (max n m)
+
+-- Min
+min : ℕ → ℕ → ℕ
+min zero m = zero
+min (suc n) zero = suc n
+min (suc n) (suc m) = suc (min n m)
 ```
 
 We can also define a "predecessor" operation, which partially undoes the successor suc : ℕ → ℕ. Of course, it can't fully undo it, since 0 has nowhere to go but to itself.
@@ -223,20 +254,23 @@ concatenation `[1, 2, 3] ++ [4, 5, 6]` is `[1, 2, 3, 4, 5, 6]`.
 _++_ : {A : Type} → List A → List A → List A
 [] ++ L2 = L2                        -- concatenating the empty list to a list doesn't change it.
 (x :: L1) ++ L2 = x :: (L1 ++ L2)    -- [x, rest] ++ L2 should be [x, rest ++ L2].
+-- think of this as addition
 ```
 
 We can define the length of a list by recursion
 ```
 length : {A : Type} → List A → ℕ
 -- Exercise:
-length L = {!!}
+length [] = zero
+length (x :: L) = suc (length L)
 ```
 
 A natural number can be seen as a list of tally marks.
 ```
 ℕ→List⊤ : ℕ → List ⊤
 -- Exercise:
-ℕ→List⊤ n = {!!}
+ℕ→List⊤ zero = []
+ℕ→List⊤ (suc n) = tt :: ℕ→List⊤ (n)
 ```
 
 Together with `length : List ⊤ → ℕ`, we have a bijection between the
@@ -275,11 +309,13 @@ maps to that effect:
 ```
 Bool→⊤⊎⊤ : Bool → ⊤ ⊎ ⊤
 -- Exercise:
-Bool→⊤⊎⊤ b = {!!}
+Bool→⊤⊎⊤ true = inl tt
+Bool→⊤⊎⊤ false = inr tt
 
 ⊤⊎⊤→Bool : ⊤ ⊎ ⊤ → Bool
 -- Exercise:
-⊤⊎⊤→Bool c = {!!}
+⊤⊎⊤→Bool (inl _) = true
+⊤⊎⊤→Bool (inr _) = false
 ```
 
 Clearly, if you turned a `Bool` into an element of `⊤ ⊎ ⊤` and then
@@ -293,11 +329,11 @@ to equivalence, but again we can't yet fully express that.
 ```
 ∅⊎-to : ∀ {ℓ} (A : Type ℓ) → ∅ ⊎ A → A
 -- Exercise:
-∅⊎-to A x = {!!}
+∅⊎-to A (inr a) = a
 
 ∅⊎-fro : ∀ {ℓ} (A : Type ℓ) → A → ∅ ⊎ A
 -- Exercise:
-∅⊎-fro A a = {!!}
+∅⊎-fro A a = inr a
 ```
 
 Now we can describe the integers. An integer is either a natural
@@ -315,12 +351,14 @@ then negated):
 ```
 ℤ→ℕ⊎ℕ : ℤ → ℕ ⊎ ℕ
 -- Exercise:
-ℤ→ℕ⊎ℕ z = {!!}
+ℤ→ℕ⊎ℕ (pos n) = inl n
+ℤ→ℕ⊎ℕ (negsuc n) = inr n
 
 
 ℕ⊎ℕ→ℤ : ℕ ⊎ ℕ → ℤ
 -- Exercise:
-ℕ⊎ℕ→ℤ z = {!!}
+ℕ⊎ℕ→ℤ (inl a) = pos a
+ℕ⊎ℕ→ℤ (inr b) = negsuc b
 ```
 
 We can define the various arithmetic operations of the
@@ -337,11 +375,15 @@ Now we can define the successor of integers which sends `z` to `z +
 ```
 sucℤ : ℤ → ℤ
 -- Exercise:
-sucℤ z = {!!}
+sucℤ (pos n) = pos (suc n)
+sucℤ (negsuc zero) = pos zero
+sucℤ (negsuc (suc n)) = negsuc n
 
 predℤ : ℤ → ℤ
 -- Exercise:
-predℤ z = {!!}
+predℤ (pos zero) = negsuc zero -- -1
+predℤ (pos (suc n)) = pos n
+predℤ (negsuc n) = negsuc (suc n)
 ```
 
 Now we turn our attention to defining addition of integers. Since the
@@ -352,7 +394,7 @@ these cases out.
 ```
 _+pos_ : ℤ → ℕ → ℤ
 -- Exercise:
-z +pos n = {!!}
+z +pos n = {!  !}
 
 _+negsuc_ : ℤ → ℕ → ℤ
 -- Exercise:
@@ -395,3 +437,4 @@ infix  8 -_
 infixl 7 _·_ _·ℤ_
 infixl 6 _+_ _+ℤ_ _-_
 ```
+ 
