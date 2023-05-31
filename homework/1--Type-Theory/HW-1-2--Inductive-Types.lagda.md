@@ -394,11 +394,15 @@ these cases out.
 ```
 _+pos_ : ℤ → ℕ → ℤ
 -- Exercise:
-z +pos n = {!  !}
+-- z +pos n = {!  !}
+z +pos zero = z
+z +pos suc n = sucℤ (z +pos n)
+
 
 _+negsuc_ : ℤ → ℕ → ℤ
 -- Exercise:
-z +negsuc n = {!!}
+z +negsuc zero = predℤ z
+z +negsuc suc n = predℤ (z +negsuc n)
 
 _+ℤ_ : ℤ → ℤ → ℤ
 m +ℤ pos n = m +pos n
@@ -411,7 +415,9 @@ terms of addition and negation.
 ```
 -_ : ℤ → ℤ
 -- Exercise:
-- z = {!!}
+- pos zero = pos zero
+- pos (suc n) = negsuc n
+- negsuc n = pos (suc n)
 
 _-_ : ℤ → ℤ → ℤ
 m - n = m +ℤ (- n)
@@ -422,7 +428,20 @@ of integers.
 ```
 _·ℤ_ : ℤ → ℤ → ℤ
 -- Exercise:
-n ·ℤ m = {!!}
+-- n ·ℤ m = {!!}
+-- Case: either n or m is 0
+pos zero ·ℤ _ = pos zero
+_ ·ℤ pos zero = pos zero
+-- Case: n is positive
+-- Subcase: m is positive
+pos (suc n) ·ℤ pos m = (pos n) ·ℤ (pos m) +ℤ (pos m)
+-- Subcase: m is negative
+pos (suc n) ·ℤ negsuc m = - ((pos n) ·ℤ (- negsuc m) +ℤ (negsuc m))
+-- Case: n is negative
+-- Subcase: m is positive
+negsuc n ·ℤ pos m = {! !}
+-- Subcase: m is negative
+negsuc n ·ℤ negsuc m = {!!}
 ```
 
 # Extra:
@@ -437,4 +456,4 @@ infix  8 -_
 infixl 7 _·_ _·ℤ_
 infixl 6 _+_ _+ℤ_ _-_
 ```
- 
+  
