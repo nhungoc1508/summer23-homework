@@ -207,12 +207,14 @@ following two implications:
 
 implies¬¬ : (P : Type) → P impliesP (¬ ¬ P)
 -- Exercise
-implies¬¬ P p = {!!}
+implies¬¬ P p = λ f → f p
+-- f : ¬ P, p : P -> apply again
 
 
 ¬¬¬implies¬ : (P : Type) → (¬ ¬ ¬ P) impliesP (¬ P)
 -- Exercise
-¬¬¬implies¬ P nnnp = {!!}
+¬¬¬implies¬ P nnnp = λ x → {!   !}
+-- nnnp : ¬ (¬ (¬ P)); x : P
 ```
 
 One way to understand the difference between `¬ ¬ P` and `P` is that
