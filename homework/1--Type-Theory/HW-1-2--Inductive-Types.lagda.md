@@ -428,20 +428,10 @@ of integers.
 ```
 _·ℤ_ : ℤ → ℤ → ℤ
 -- Exercise:
--- n ·ℤ m = {!!}
--- Case: either n or m is 0
-pos zero ·ℤ _ = pos zero
-_ ·ℤ pos zero = pos zero
--- Case: n is positive
--- Subcase: m is positive
-pos (suc n) ·ℤ pos m = (pos n) ·ℤ (pos m) +ℤ (pos m)
--- Subcase: m is negative
-pos (suc n) ·ℤ negsuc m = - ((pos n) ·ℤ (- negsuc m) +ℤ (negsuc m))
--- Case: n is negative
--- Subcase: m is positive
-negsuc n ·ℤ pos m = {! !}
--- Subcase: m is negative
-negsuc n ·ℤ negsuc m = {!!}
+pos zero ·ℤ m = pos zero
+pos (suc n) ·ℤ m = pos n +ℤ (pos n) ·ℤ m
+negsuc zero ·ℤ m = - m
+negsuc (suc n) ·ℤ m = - m +ℤ (negsuc n) ·ℤ m -- - (1+(1+n)) · m = - m + -(1+n) · m
 ```
 
 # Extra:
@@ -456,4 +446,4 @@ infix  8 -_
 infixl 7 _·_ _·ℤ_
 infixl 6 _+_ _+ℤ_ _-_
 ```
-  
+   
