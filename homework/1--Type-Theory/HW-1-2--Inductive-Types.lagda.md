@@ -64,9 +64,8 @@ and `y` are `true`.
 ```
 _and_ : Bool → Bool → Bool
 -- Exercise:
-true and true = true
-true and false = false
-false and _ = false
+true and x = x
+false and x = false
 -- Alternative:
 -- _and_ true = id -- λ x → x
 -- _and_ false = const false -- λ x → false
@@ -89,8 +88,7 @@ if it seems unintuitive.
 
 ```
 _⇒_ : Bool → Bool → Bool
-true ⇒ true  = true
-true ⇒ false = false
+true ⇒ x  = x
 -- Here we use a "wildcard" (the underscore "_") to say that the
 -- definition we are given is valid for anything we put in that spot.
 false ⇒ _    = true

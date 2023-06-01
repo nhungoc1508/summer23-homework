@@ -36,6 +36,7 @@ such a function, then we think of it as describing the proposition
 that "`P a` equals `true`". Here is a definition of the proposition
 that a number is even, defined together with the proposition that a
 number is odd:
+(Decidable propositions -- can decide whether true or false)
 
 ```
 isEven : ℕ → Bool
@@ -56,6 +57,11 @@ isZero zero = true
 isZero (suc n) = false
 ```
 
+```
+--- filter isEvent (1,2,3,4,5,6) = (2,4,6)
+filter : (A : Type) → (A → Bool) → List A → List A
+filter p L = {!   !}
+```
 
 This way of representing propositions is most common in programming
 languages without dependent types. But there is another very powerful
@@ -116,7 +122,7 @@ other: this is also known as "logical equivalence".
 
 ```
 _iffP_ : Type → Type → Type
-P iffP Q = (P impliesP Q) andP (Q impliesP P)
+P iffP Q = (P impliesP Q) andP (Q impliesP P) -- (P → Q) × (Q → P)
 ```
 
 We can prove that these definitions correspond correctly with the
@@ -125,13 +131,58 @@ left of the `iffP`, we use the ordinary operation on Booleans, and on
 the right, we use the corresponding operation on propostions-as-types.
 
 ```
-and→Type : (a b : Bool) → (Bool→Type (a and b)) iffP ((Bool→Type a) andP (Bool→Type b))
+and→Type : (a b : Bool) → (Bool→Type (a and b)) iffP ((Bool→Type a) andP (Bool→Type b)) -- Bool→Type (a and b) → (Bool→Type a) × (Bool→Type b)
+                                                                                        -- × ((Bool→Type a) × (Bool→Type b) → Bool→Type (a and b))
 -- Exercise:
-and→Type a b = {!!}
+-- and→Type true b = (λ p → tt , p) , (λ q → (snd q))
+-- and→Type false b = (λ p → ∅-rec p) , (λ q → (fst q))
+and→Type true b = (λ p → tt , p) , λ q → snd q
+and→Type false b = (λ p → ∅-rec p) , λ q → fst q
+
+-- Recall:
+-- _⇒_ : Bool → Bool → Bool
+-- true ⇒ x  = x
+-- false ⇒ _    = true
 
 ⇒→Type : (a b : Bool) → (Bool→Type (a ⇒ b)) iffP ((Bool→Type a) impliesP (Bool→Type b))
+-- (Bool→Type (a ⇒ b)) → (Bool→Type a → Bool→Type b)
+-- × (Bool→Type a → Bool→Type b) → (Bool→Type (a ⇒ b))
 -- Exercise:
-⇒→Type a b = {!!}
+-- Below is done
+-- ⇒→Type true true = (λ x tt → tt) , λ x → tt
+-- ⇒→Type true false = (λ x tt → x) , λ x → x tt
+-- ⇒→Type false true = (λ tt x → tt) , λ x → tt
+-- ⇒→Type false false = (λ x y → y) , λ x → tt
+
+-- -- Try again here, also works
+-- ⇒→Type true true = (λ x y → tt) , λ x → x tt
+-- -- 1st: trueP impliesP (trueP impliesP trueP)
+-- --      (a ⇒ b == true ⇒ true == true == trueP) IMPLIES (aP ⇒ bP == trueP ⇒ trueP)
+-- --      x: trueP, y: trueP
+-- -- 2nd: (trueP impliesP trueP) impliesP trueP
+-- --      (aP ⇒ bP == trueP ⇒ trueP) IMPLIES (a ⇒ b == true ⇒ true)
+-- --      x: trueP impliesP trueP -- need to apply x on tt to get trueP
+-- ⇒→Type true false = (λ x y → x) , λ x → x tt
+-- -- 1st: falseP impliesP (trueP impliesP falseP)
+-- --      (a ⇒ b == true ⇒ false == false) IMPLIES (aP ⇒ bP == trueP ⇒ falseP)
+-- --      x: falseP, y: trueP
+-- -- 2nd: (trueP impliesP falseP) impliesP falseP
+-- --      (aP ⇒ bP == trueP ⇒ falseP) IMPLIES (a ⇒ b == true ⇒ false == false)
+-- --      x: trueP impliesP falseP -- need to return false so need to apply x on some trueP
+-- ⇒→Type false true = (λ x y → x) , {!   !}
+-- -- 1st: trueP impliesP (falseP impliesP trueP)
+-- --      (a ⇒ b == false ⇒ true == true) IMPLIES (aP ⇒ bP == falseP ⇒ trueP)
+-- --      x: trueP, y: falseP
+-- -- 2nd: (falseP impliesP trueP) impliesP trueP
+-- --      (aP ⇒ bP == falseP ⇒ trueP) IMPLIES (a ⇒ b == false ⇒ true == true)
+-- --
+-- ⇒→Type false false = {!   !} , {!   !} 
+
+-- Solutions (?)
+⇒→Type true b = (λ p → λ q → p) , λ f → f tt
+-- Alternative: ... = const , flip apply tt
+⇒→Type false b = (λ p → λ q → ∅-rec q) , λ f → tt
+-- Alternative: ... = λ _ → ∅-rec , const tt
 ```
 
 Negation can be seen as a special case of implication: not P is the same as P implies false.
@@ -425,3 +476,4 @@ suc n ≤ℕ suc m = n ≤ℕ m
 -- Exercise:
 ≤ℕ-antisym n m p q = {!!}
 ```
+  
