@@ -185,16 +185,20 @@ notnot false = refl {x = false}
 
 -- or properties
 or-zeroˡ : ∀ x → true or x ≡ true
-or-zeroˡ x = {!!}
+or-zeroˡ x = refl
 
 or-zeroʳ : ∀ x → x or true ≡ true
-or-zeroʳ x = {!!}
+or-zeroʳ true = refl
+or-zeroʳ false = refl
+-- Look at OG definition of _or_
 
 or-identityˡ : ∀ x → false or x ≡ x
-or-identityˡ x = {!!}
+-- or-identityˡ x = λ i → x
+or-identityˡ x = refl
 
 or-identityʳ : ∀ x → x or false ≡ x
-or-identityʳ x = {!!}
+or-identityʳ true = refl
+or-identityʳ false = refl
 
 or-comm      : ∀ x y → x or y ≡ y or x
 or-comm x y = {!!}
@@ -215,9 +219,10 @@ the "Law of Excluded Middle": `b or (not b)`.)
 Types of paths are types like any other, so we can define functions
 that accept paths as arguments and produce paths as results.
 ```
-cong : (f : A → B)
+cong : (f : A → B) -- congruent?
   → (x ≡ y)
   → f x ≡ f y
+-- cong f p i = f (p i)
 cong f p i = f (p i)
 ```
 This is the principle that says that doing the same thing to both
@@ -230,13 +235,15 @@ cong-bin : (f : A → B → C) {a a' : A} {b b' : B}
          → (q : b ≡ b')
          → (f a b) ≡ (f a' b')
 -- Exercise:
-cong-bin f p q = {!!}
+-- cong-bin f p q = λ i → cong f p i (q i) -- This works
+cong-bin f p q = λ i → f (p i) (q i) -- Also works
 
 cong-∘ : (f : A → B) (g : B → C)
   → (p : x ≡ y)
   → cong (g ∘ f) p ≡ cong g (cong f p)
 -- Exercise:
-cong-∘ f g p = {!!}
+-- Path between path
+cong-∘ f g p i j = g (f (p j)) -- !!! REVISE
 ```
 
 ## Paths in Pairs and Function Types
@@ -255,15 +262,16 @@ endpoints.
 ```
 ≡-× : {x y : A × B} → (fst x ≡ fst y) × (snd x ≡ snd y) → x ≡ y
 -- Exercise:
-≡-× (p , q) = {!!}
+≡-× (p , q) i = p i , q i
 
 ≡-fst : {x y : A × B} → x ≡ y → (fst x ≡ fst y)
 -- Exercise:
-≡-fst p = {!!}
+-- ≡-fst p i = fst (p i) -- This works
+≡-fst p = cong fst p -- Also works
 
 ≡-snd : {x y : A × B} → x ≡ y → (snd x ≡ snd y)
 -- Exercise:
-≡-snd p = {!!}
+≡-snd p i = snd (p i) -- ? I think
 ```
 
 Similarly, what is a path in a function type? It is a function landing
@@ -274,13 +282,13 @@ funExt : {f g : A → B}
   → ((x : A) → f x ≡ g x)
   → f ≡ g
 -- Exercise:
-funExt f = {!!}
+funExt h i x = h x i
 
 funExt⁻ : {f g : A → B}
   → f ≡ g
   → ((x : A) → f x ≡ g x)
 -- Exercise:
-funExt⁻ p = {!!}
+funExt⁻ h x i = h i x
 ```
 This is the principle of "function extensionality": to say that `f`
 equals `g` means that for all `x`, `f x` equals `g x`.
@@ -348,11 +356,13 @@ show that these are really isomorphisms:
 Iso-Bool-⊤⊎⊤ : Iso Bool (⊤ ⊎ ⊤)
 Iso-Bool-⊤⊎⊤ = iso Bool→⊤⊎⊤ ⊤⊎⊤→Bool s r
   where
-    s : section Bool→⊤⊎⊤ ⊤⊎⊤→Bool
-    s x = {!!}
+    s : section Bool→⊤⊎⊤ ⊤⊎⊤→Bool -- Function from Bool to Path
+    s (inl tt) = refl
+    s (inr tt) = refl
 
     r : retract Bool→⊤⊎⊤ ⊤⊎⊤→Bool
-    r x = {!!}
+    r true = refl
+    r false = refl
 
 -- Exercise:
 -- s x = ?
@@ -390,10 +400,14 @@ Iso-ℕ-List⊤ : Iso ℕ (List ⊤)
 Iso-ℕ-List⊤ = iso ℕ→List⊤ length s r
   where
     s : section ℕ→List⊤ length
-    s x = {!!}
+    s [] = λ i → [] -- ? alt: refl
+    -- s (tt :: L) = λ i → tt :: (s L i) -- this works
+    s (tt :: L) = cong (tt ::_) (s L)
 
     r : retract ℕ→List⊤ length
-    r x = {!!}
+    -- r zero = λ i → zero -- this works
+    r zero = refl
+    r (suc x) = λ i → suc (r x i) -- ? try to see if there's alt
 ```
 
 Not all isomorphisms have to go between different types. A type can be
@@ -407,10 +421,12 @@ not-Iso : Iso Bool Bool
 not-Iso = iso not not s r
   where
     s : section not not
-    s x = {!!}
+    s true = refl
+    s false = refl
 
     r : retract not not
-    r x = {!!}
+    r true = refl
+    r false = refl
 
 -- Exercise
 --  s x = ?
@@ -425,7 +441,7 @@ sucℤ-Iso = iso sucℤ predℤ s r
     r x = {!!}
 ```
 
-## Substitution and Paths as Equalities
+## Substitution and Paths as Equalities -- ! HOMEWORK: UNTIL THIS POINT
 
 Perhaps the most fundamental principle of equality is that we may
 substitute equal things for equal things. Written out, substitution
@@ -549,4 +565,4 @@ inr b1 ≡⊎ inr b2 = b1 ≡ b2
 ≡iff≡⊎ : {A B : Type} (x y : A ⊎ B) → (x ≡ y) iffP (x ≡⊎ y)
 ≡iff≡⊎ x y = {!!}
 ```
- 
+    
