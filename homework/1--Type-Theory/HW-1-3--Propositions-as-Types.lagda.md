@@ -1,6 +1,7 @@
 
 # Homework 1-3: Propositions as Types 
 ```
+{-# OPTIONS --allow-unsolved-metas #-}
 module homework.1--Type-Theory.HW-1-3--Propositions-as-Types where
 
 open import Cubical.Foundations.Prelude
@@ -458,6 +459,11 @@ equality.
   → (n1 + m1) ≡ℕ (n2 + m2)
 -- Exercise:
 +-≡ℕ n1 n2 m1 m2 p q = {!!}
+```
+
+```
+-- =Bool-preserves : (f : Bool → Bool) (a b : Bool) → a =Bool b → (f a) =Bool (f b)
+-- =Bool-preserves f (a) (b) p = ?
 ```
 
 It would be quite tedious if we had to define the specific notion of
