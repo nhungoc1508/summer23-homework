@@ -60,7 +60,8 @@ isZero (suc n) = false
 ```
 --- filter isEvent (1,2,3,4,5,6) = (2,4,6)
 filter : (A : Type) → (A → Bool) → List A → List A
-filter p L = {!   !}
+filter p L [] = [] -- Base case: empty list -> return empty list
+filter p L (x :: a) = if (L x) then (x :: filter p L a) else (filter p L a)
 ```
 
 This way of representing propositions is most common in programming
@@ -194,7 +195,18 @@ infix 3 ¬_  -- This is just to make ¬ go on the outside of most formulas
 
 -- Exercise
 not→Type : (a : Bool) → (Bool→Type (not a)) iffP (¬ Bool→Type a)
-not→Type a = {!!}
+-- (Bool→Type (not a) ⇒ (¬ Bool→Type a))
+-- × ((¬ Bool→Type a) ⇒ Bool→Type (not a))
+not→Type true = (λ x y → x) , (λ f → f tt)
+-- a = true -> Bool→Type (not a) = falseP
+-- ¬ Bool→Type a = ¬ trueP = falseP
+-- 1st: x : falseP ; y : trueP
+-- 2nd: f : ¬ trueP -> apply on some trueP
+not→Type false = (λ x y → y) , (λ f → tt)
+-- a = false -> Bool→Type (not a) = trueP
+-- ¬ Bool→Type a = ¬ falseP = trueP
+-- 1st: x : trueP ; y : falseP
+-- 2nd: ¬ falseP
 ```
 
 Now the logic of the propositions-as-types is not exactly the same as
@@ -213,8 +225,9 @@ implies¬¬ P p = λ f → f p
 
 ¬¬¬implies¬ : (P : Type) → (¬ ¬ ¬ P) impliesP (¬ P)
 -- Exercise
-¬¬¬implies¬ P nnnp = λ x → {!   !}
--- nnnp : ¬ (¬ (¬ P)); x : P
+¬¬¬implies¬ P nnnp = λ x → nnnp λ f → f x
+-- nnnp : ¬ (¬ (¬ P)); x : P ; f : ¬ P
+-- applying f on x gives ¬ P
 ```
 
 One way to understand the difference between `¬ ¬ P` and `P` is that
@@ -233,7 +246,13 @@ straightforward:
 ```
 or→Type-fro : (a b : Bool) → ((Bool→Type a) ⊎ (Bool→Type b)) → Bool→Type (a or b)
 -- Exercise:
-or→Type-fro a b p = {!!}
+-- or→Type-fro a b p = {! !}
+-- or→Type-fro a b (inl x) = {!  !}
+or→Type-fro true b (inl x) = tt
+-- x : Bool→Type a
+or→Type-fro true b (inr y) = tt
+or→Type-fro false b (inr y) = y
+-- y : Bool→Type b
 ```
 
 In the other direction, however, we can define two *different*
@@ -241,7 +260,9 @@ functions with the same type.
 ```
 or→Type-to : (a b : Bool) →  Bool→Type (a or b) → ((Bool→Type a) ⊎ (Bool→Type b))
 -- Exercise:
-or→Type-to a b p = {!!}
+or→Type-to true true p = inl p
+or→Type-to true false p = inl p
+or→Type-to false true p = inr p
 
 or→Type-to' : (a b : Bool) →  Bool→Type (a or b) → ((Bool→Type a) ⊎ (Bool→Type b))
 -- Exercise:
@@ -478,4 +499,4 @@ suc n ≤ℕ suc m = n ≤ℕ m
 -- Exercise:
 ≤ℕ-antisym n m p q = {!!}
 ```
-  
+    
