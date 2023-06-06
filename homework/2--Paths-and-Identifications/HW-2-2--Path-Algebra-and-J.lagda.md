@@ -63,7 +63,10 @@ _ = {! ~ i0!}
 -}
 
 sym : x ≡ y → y ≡ x
-sym p i = p (~ i)
+sym p i = p (~ i) -- ? subst way to write sym?
+
+-- sym' : x ≡ y → y ≡ x
+-- sym' {x ≡ x} p = (subst {! λ z → z ≡ x  !} {!   !} {!   !})
 ```
 
 Now, there's a fairly evident question we can ask: what happens if we
@@ -82,8 +85,8 @@ We would like to define a form of transitivity for paths, to mirror
 the transitivity of equality. Here is a reasonable definition:
 
 ```
-trans : x ≡ y → y ≡ z → x ≡ z
-trans {x = x} p q = subst (λ k → x ≡ k) q p
+trans : x ≡ y → y ≡ z → x ≡ z -- ? note this is transitivity and not transport
+trans {x = x} p q = subst (λ k → x ≡ k) q p -- TODO: revise
 ```
 
 However, it would be difficult to reason about the paths-between-paths
