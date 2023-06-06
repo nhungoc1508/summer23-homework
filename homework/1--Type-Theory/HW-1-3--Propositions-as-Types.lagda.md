@@ -423,7 +423,11 @@ We can similarly define equality of natural numbers.
 
 _≡ℕ_ : (n m : ℕ) → Type
 -- Exercise:
-n ≡ℕ m = {!!}
+-- n ≡ℕ m = ?
+zero ≡ℕ zero = ⊤
+zero ≡ℕ suc m = ∅
+suc n ≡ℕ zero = ∅
+suc n ≡ℕ suc m = n ≡ℕ m
 ```
 Try writing out this definition in plain language to check your
 understanding.
