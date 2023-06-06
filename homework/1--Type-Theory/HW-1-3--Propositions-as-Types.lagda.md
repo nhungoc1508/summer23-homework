@@ -438,7 +438,9 @@ symmetric, and transitive relation.
 ```
 ≡ℕ-refl : (n : ℕ) → n ≡ℕ n
 -- Exercise:
-≡ℕ-refl n = {!!}
+-- ≡ℕ-refl n = ?
+≡ℕ-refl zero = tt
+≡ℕ-refl (suc n) = ≡ℕ-refl n
 
 ≡ℕ-sym : (n m : ℕ)
   → n ≡ℕ m

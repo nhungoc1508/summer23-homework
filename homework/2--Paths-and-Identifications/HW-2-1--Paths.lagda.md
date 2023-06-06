@@ -571,9 +571,13 @@ We can do the same for the other equalities we covered in 1-3.
   where
     to : (x y : ℕ) → (x ≡ y) → (x ≡ℕ y)
     to zero zero p = tt
-    to zero (suc y) p = subst (λ x → {! !}) p zero
-    to (suc x) zero p = {!   !}
-    to (suc x) (suc y) p = {!   !}
+    -- to zero (suc y) p = subst isZeroP p tt -- works
+    to zero (suc y) p = subst (λ z → zero ≡ℕ z) p tt
+    to (suc x) zero p = subst ((suc x) ≡ℕ_) p (≡ℕ-refl x)
+    to (suc x) (suc y) p = to x y (cong predℕ p)
+
+    to' : (x y : ℕ) → (x ≡ y) → (x ≡ℕ y)
+    to' x y p = subst (x ≡ℕ_) p (≡ℕ-refl x)
 
     fro : (x y : ℕ) → (x ≡ℕ y) → (x ≡ y)
     fro zero zero p = refl
@@ -610,17 +614,17 @@ refl⊎ (inr b) = refl
     unr _ (inr b) = b
     unr default (inl _) = default
 
-    to : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
-    to (inl a) (inl b) p = cong (unl a) p
-    to (inl a) (inr b) p = subst (λ x → (inl a) ≡⊎ x ) p refl
-    to (inr b) (inl a) p = subst (λ x → (inr b) ≡⊎ x) p refl
-    to (inr b) (inr a) p = {!   !}
+    -- to : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
+    -- to (inl a) (inl b) p = cong (unl a) p
+    -- to (inl a) (inr b) p = subst (λ x → (inl a) ≡⊎ x ) p refl
+    -- to (inr b) (inl a) p = subst (λ x → (inr b) ≡⊎ x) p refl
+    -- to (inr b) (inr a) p = {!   !}
 
-    to' : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
-    to' x y p = subst (λ z → x ≡⊎ z) p ((refl⊎ x))
+    to : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
+    to x y p = subst (λ z → x ≡⊎ z) p ((refl⊎ x))
 
     fro : (x y : A ⊎ B) → (x ≡⊎ y) → (x ≡ y)
     fro (inl a) (inl b) p = cong inl p -- also works: inl (p i) -- applies to both side
     fro (inr b) (inr a) p = cong inr p
 ```
-           
+            
