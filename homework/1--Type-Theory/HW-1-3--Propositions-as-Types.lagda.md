@@ -383,7 +383,8 @@ relation on Booleans.
 ```
 ≡Bool-refl : (a : Bool) → a ≡Bool a
 -- Exercise:
-≡Bool-refl a = {!!}
+≡Bool-refl true = tt
+≡Bool-refl false = tt
 
 ≡Bool-sym : (a b : Bool)
   → a ≡Bool b

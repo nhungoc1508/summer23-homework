@@ -9,6 +9,7 @@ open import Cubical.Data.Sigma.Base
 open import homework.1--Type-Theory.HW-1-1--Types-and-Functions
 open import homework.1--Type-Theory.HW-1-2--Inductive-Types
 open import homework.1--Type-Theory.HW-1-3--Propositions-as-Types
+-- open import homework-solutions.1--Type-Theory.1-3--Propositions-as-Types
 ```
 
 Aside: This block lets us refer to some arbitrary types `A`, `B`, ... and
@@ -201,13 +202,24 @@ or-identityʳ true = refl
 or-identityʳ false = refl
 
 or-comm      : ∀ x y → x or y ≡ y or x
-or-comm x y = {!!}
+or-comm true true = refl
+or-comm true false = refl
+or-comm false true = refl
+or-comm false false = refl
 
 or-assoc     : ∀ x y z → x or (y or z) ≡ (x or y) or z
-or-assoc x y z = {!!}
+or-assoc true true true = refl
+or-assoc true true false = refl
+or-assoc true false true = refl
+or-assoc true false false = refl
+or-assoc false true true = refl
+or-assoc false true false = refl
+or-assoc false false true = refl
+or-assoc false false false = refl
 
 or-idem      : ∀ x → x or x ≡ x
-or-idem x = {!!}
+or-idem true = refl
+or-idem false = refl
 ```
 
 OK, that's enough of that --- it's straightforward to keep going.
@@ -301,7 +313,7 @@ The `≡` constructor has low precedence, so `f x ≡ f y` means `(f x) ≡
 funExt2 : {f g : A → B → C}
        (p : (x : A) (y : B) → f x y ≡ g x y)
        → f ≡ g
-funExt2 p i x y = {!!}
+funExt2 p i x y = p x y i
 ```
 
 ## Isomorphisms
@@ -371,10 +383,10 @@ Iso-∅⊎ : ∀ {ℓ} (A : Type ℓ) → Iso (∅ ⊎ A) A
 Iso-∅⊎ A = iso (∅⊎-to A) (∅⊎-fro A) s r
   where
     s : section (∅⊎-to A) (∅⊎-fro A)
-    s x = {!!}
+    s x = refl
 
     r : retract (∅⊎-to A) (∅⊎-fro A)
-    r x = {!!}
+    r (inr a) i = inr a
 
 -- Exercise:
 -- s x = ?
@@ -383,10 +395,12 @@ Iso-ℤ-ℕ⊎ℕ : Iso ℤ (ℕ ⊎ ℕ)
 Iso-ℤ-ℕ⊎ℕ = iso ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ s r
   where
     s : section ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ
-    s x = {!!}
+    s (inl a) i = inl a
+    s (inr a) i = inr a
 
     r : retract ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ
-    r x = {!!}
+    r (pos n) i = pos n
+    r (negsuc n) i = negsuc n
 ```
 
 Not all isomorphisms will be so trivial. This one we need to construct
@@ -435,19 +449,25 @@ sucℤ-Iso : Iso ℤ ℤ
 sucℤ-Iso = iso sucℤ predℤ s r
   where
     s : section sucℤ predℤ
-    s x = {!!}
+    s (pos zero) = refl
+    s (pos (suc n)) = refl
+    s (negsuc zero) = refl
+    s (negsuc (suc n)) = refl
 
     r : retract sucℤ predℤ
-    r x = {!!}
+    r (pos zero) = refl
+    r (pos (suc n)) = refl
+    r (negsuc zero) = refl
+    r (negsuc (suc n)) = refl
 ```
 
-## Substitution and Paths as Equalities -- ! HOMEWORK: UNTIL THIS POINT
+## Substitution and Paths as Equalities
 
 Perhaps the most fundamental principle of equality is that we may
 substitute equal things for equal things. Written out, substitution
 should have this type signature:
 
-`subst : (B : A → Type) (x ≡ y) → B x → B y`
+`subst : (B : A → Type) (x ≡ y) → B x → B y` -- input: type dependent on another type + path
 
 The idea here is that if `p : x ≡ y`, then `subst B p : B x → B y` is
 the function that substitutes `x` for `y` in things of type `B x`
@@ -466,11 +486,11 @@ able to "continuously move" an element `a : A i0` to some element of
 
 Cubical Agda axiomatizes this idea with a function called `transp`:
 
-`transp : ∀ (φ : I) (A : (i : I) → Type) (a : A i0) → A i1`
+`transp : ∀ (A : (i : I) (φ : I) → Type) (a : A i0) → A i1`
 
 The function transp is slightly more general than what we need (we'll see what role the φ plays later in Part 2). What we really need is this function called "transport":
 ```
-transport : {A B : Type ℓ} → A ≡ B → A → B
+transport : {A B : Type ℓ} → A ≡ B → A → B -- path + elem of first type -> elem of second type
 transport p a = transp (λ i → p i) i0 a
 ```
 
@@ -486,8 +506,11 @@ Using substitution, we can show that there is no path from `true` to
 `false` in `Bool`, and vice versa.
 
 ```
-true≢false : ¬ true ≡ false
-true≢false p = subst (λ b → true ≡Bool b) p tt
+true≢false : ¬ true ≡ false -- ¬ == implies empty
+true≢false p = subst (λ b → true ≡Bool b) p tt -- OG
+-- Recall:
+-- true ≡Bool true = ⊤
+-- true ≡Bool false = ∅
 ```
 
 Let's take a minute to make sure we really understand what's going on
@@ -508,7 +531,7 @@ Give it a try in the reverse:
 ```
 false≢true : ¬ false ≡ true
 -- Exercise
-false≢true p = {!!}
+false≢true p = subst (λ b → false ≡Bool b) p tt
 ```
 
 
@@ -521,10 +544,16 @@ the same thing as the equalities we define in 1-3!
 ≡iff≡Bool a b = (to a b) , (fro a b)
   where
     to : (x y : Bool) → (x ≡ y) → (x ≡Bool y)
-    to x y = {!!}
+    to true true = λ _ → tt
+    to true false = true≢false
+    to false true = false≢true
+    to false false = λ _ → tt
 
     fro : (x y : Bool) → (x ≡Bool y) → (x ≡ y)
-    fro x y = {!!}
+    fro true true = λ _ → refl
+    fro true false = ∅-rec -- mapping out of empty
+    fro false true = ∅-rec
+    fro false false = λ _ → refl
 ```
 
 You might be wondering whether we could promote the two maps `to` and
@@ -559,10 +588,35 @@ inl a ≡⊎ inr b = ∅
 inr b ≡⊎ inl a = ∅
 inr b1 ≡⊎ inr b2 = b1 ≡ b2
 
+refl⊎ : {A B : Type} (x : A ⊎ B) → x ≡⊎ x
+refl⊎ (inl a) = refl
+refl⊎ (inr b) = refl
+
 -- Exercise
 -- ≡iff≡⊎ x y = ?
 -- Hint: can you see a way to define the forward direction using subst?
 ≡iff≡⊎ : {A B : Type} (x y : A ⊎ B) → (x ≡ y) iffP (x ≡⊎ y)
-≡iff≡⊎ x y = {!!}
+≡iff≡⊎ x y = (to x y) , (fro x y)
+  where
+    unl : (default : A) (x : A ⊎ B) → A
+    unl _ (inl a) = a
+    unl default (inr _) = default
+
+    unr : (default : B) (x : A ⊎ B) → B
+    unr _ (inr b) = b
+    unr default (inl _) = default
+
+    to : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
+    to (inl a) (inl b) p = cong (unl a) p
+    to (inl a) (inr b) p = subst (λ x → (inl a) ≡⊎ x ) p refl
+    to (inr b) (inl a) p = subst (λ x → (inr b) ≡⊎ x) p refl
+    to (inr b) (inr a) p = {!   !}
+
+    to' : (x y : A ⊎ B) → (x ≡ y) → (x ≡⊎ y)
+    to' x y p = subst (λ z → x ≡⊎ z) p ((refl⊎ x))
+
+    fro : (x y : A ⊎ B) → (x ≡⊎ y) → (x ≡ y)
+    fro (inl a) (inl b) p = cong inl p -- also works: inl (p i) -- applies to both side
+    fro (inr b) (inr a) p = cong inr p
 ```
-    
+         
