@@ -165,6 +165,9 @@ is the obvious one, when `B` depends on `A`. The definitions are the
 same as in the non-dependent case, so try to fill in the `PathP` type.
 
 ```
+-- ! Homework: Path for intergers (similar to paths for N, paths for bool, etc.)
+-- ! define equalityZ -- have to use pattern matching
+-- ! iffZ
 module _ {A : Type ℓ} {B : A → Type ℓ'}
   {x y : Σ A B}
   where
