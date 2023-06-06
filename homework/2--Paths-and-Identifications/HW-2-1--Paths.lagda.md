@@ -570,10 +570,10 @@ We can do the same for the other equalities we covered in 1-3.
 ≡iff≡ℕ a b = (to a b) , (fro a b)
   where
     to : (x y : ℕ) → (x ≡ y) → (x ≡ℕ y)
-    to zero zero = λ _ → tt
-    to zero (suc y) = {!!}
-    to (suc x) zero = {!   !}
-    to (suc x) (suc y) = {!   !}
+    to zero zero p = tt
+    to zero (suc y) p = subst (λ x → {! !}) p zero
+    to (suc x) zero p = {!   !}
+    to (suc x) (suc y) p = {!   !}
 
     fro : (x y : ℕ) → (x ≡ℕ y) → (x ≡ y)
     fro zero zero p = refl
@@ -623,4 +623,4 @@ refl⊎ (inr b) = refl
     fro (inl a) (inl b) p = cong inl p -- also works: inl (p i) -- applies to both side
     fro (inr b) (inr a) p = cong inr p
 ```
-         
+           
