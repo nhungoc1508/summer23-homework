@@ -57,16 +57,16 @@ principle for paths:
 -- To see what the expression evaluates to,
 -- uncomment this block and move the cursor into the goal
 -- and press `C-c C-n`. (`C-n` for "normalise").
-{-
+
 _ : I
-_ = {! ~ i0!}
--}
+_ = ~ i0
+
 
 sym : x ≡ y → y ≡ x
 sym p i = p (~ i) -- ? subst way to write sym?
 
 -- sym' : x ≡ y → y ≡ x
--- sym' {x ≡ x} p = (subst {! λ z → z ≡ x  !} {!   !} {!   !})
+-- sym' {x ≡ x} p = (subst {! λ z → z ≡ x !} {!  p !} {! refl  !})
 ```
 
 Now, there's a fairly evident question we can ask: what happens if we
@@ -86,6 +86,7 @@ the transitivity of equality. Here is a reasonable definition:
 
 ```
 trans : x ≡ y → y ≡ z → x ≡ z -- ? note this is transitivity and not transport
+-- This is currently not very computationally fast
 trans {x = x} p q = subst (λ k → x ≡ k) q p -- TODO: revise
 ```
 
@@ -99,7 +100,7 @@ composition of paths in 2-4.
 
 
 A path between paths is a path in type of paths, which is to say, a
-function `a : I → (I → A)`. We can therefore think of
+function `a : (i : I) → ((j : I) → A)`. We can therefore think of
 paths-between-paths as functions of two interval variables `i` and
 `j`. Though we don't want to use the elements of `I` like data and so
 don't let ourselves form the type `I × I`, we can nevertheless think
@@ -165,21 +166,18 @@ is the obvious one, when `B` depends on `A`. The definitions are the
 same as in the non-dependent case, so try to fill in the `PathP` type.
 
 ```
--- ! Homework: Path for intergers (similar to paths for N, paths for bool, etc.)
--- ! define equalityZ -- have to use pattern matching
--- ! iffZ
 module _ {A : Type ℓ} {B : A → Type ℓ'}
   {x y : Σ A B}
   where
 
   -- Exercise:
-  ΣPathP' : Σ[ p ∈ (fst x ≡ fst y) ] PathP {!!} {!!} {!!}
+  ΣPathP' : Σ[ p ∈ (fst x ≡ fst y) ] PathP (λ i → B (p i)) (snd x) (snd y)
           → x ≡ y
   ΣPathP' eq i = fst eq i , snd eq i
 
   -- Exercise:
   PathPΣ' : x ≡ y
-          → Σ[ p ∈ (fst x ≡ fst y) ] PathP {!!} {!!} {!!}
+          → Σ[ p ∈ (fst x ≡ fst y) ] PathP (λ i → B (p i))(snd x) (snd y)
   PathPΣ' eq = (λ i → fst (eq i)) , (λ i → snd (eq i))
 
 ```
@@ -194,13 +192,13 @@ module _ {A : I → Type ℓ} {B : (i : I) → A i → Type ℓ'}
   where
 
   -- Exercise:
-  ΣPathP : Σ[ p ∈ PathP {!!} {!!} {!!} ] PathP {!!} {!!} {!!}
+  ΣPathP : Σ[ p ∈ PathP (A) (fst x) (fst y) ] PathP (λ i → B i (p i)) (snd x) (snd y)
          → PathP (λ i → Σ (A i) (B i)) x y
   ΣPathP eq i = fst eq i , snd eq i
 
   -- Exercise:
   PathPΣ : PathP (λ i → Σ (A i) (B i)) x y
-         → Σ[ p ∈ PathP {!!} {!!} {!!} ] PathP {!!} {!!} {!!}
+         → Σ[ p ∈ PathP A (fst x) (fst y) ] PathP (λ i → B i (p i)) (snd x) (snd y)
   PathPΣ eq = (λ i → fst (eq i)) , (λ i → snd (eq i))
 ```
 
@@ -212,8 +210,8 @@ identical but the type improves:
 -- Exercise:
 depFunExt : {B : A → I → Type}
   {f : (x : A) → B x i0} {g : (x : A) → B x i1}
-  → ((x : A) → PathP {!!} {!!} {!!})
-  → PathP {!!} f g
+  → ((x : A) → PathP (λ i → B x i) (f x) (g x))
+  → PathP (λ i → (x : A) → B x i) f g
 depFunExt p i x = p x i
 ```
 
@@ -554,3 +552,4 @@ Let's do the encode-decode method again, but for coproducts.
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = {!!}
 ```
+ 
