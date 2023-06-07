@@ -239,6 +239,20 @@ Here's the picture again:
        a00 — — — > a10         ∙ — >
              a-0                 i
 
+```
+-- ! Other squares
+
+reflSquare1 : {A : Type ℓ} {a0 a1 : A}
+       → (p : a0 ≡ a1)
+       → Square refl refl p p
+reflSquare1 p = λ i j → p i -- alt: p = λ i → refl {x = p i}
+
+reflSquare2 : {A : Type ℓ} {a0 a1 : A}
+       → (p : a0 ≡ a1)
+       → Square p p refl refl
+reflSquare2 p = λ i j → p j -- alt: refl {x = λ j → p j}
+```
+
 To define interesting squares, we'll need to axiomatize a bit more
 structure from the unit interval $[0,1]$. The functions
 $max, min : [0, 1] × [0, 1] → [0, 1]$ are quite useful for constructing
@@ -247,23 +261,23 @@ homotopy between $p(i) = p(max(0, i))$ and the constant path at
 $p(1) = p(max(1, i))$. Similarly, $p ∘ min$ is a homotopy between the
 constant path at $p(0)$ and $p$.
 
-We will axiomatize these with interval operations `∨` and `∧` (for max
+We will axiomatize these with interval operations `∨` (̌\vee) and `∧` (\wedge) (for max
 and min respectively). Cubical Agda automatically computes the values
 of `∨` and `∧` on the endpoints `i0` and `i1`: these hold
 definitionally.
 
 ```
 -- Uncomment this block and try normalising the following expressions.
-{-
-_ : I
-_ = {! i0 ∨ i0!}
-_ : I
-_ = {! i0 ∨ i1!}
-_ : I
-_ = {! i0 ∧ i0!}
-_ : I
-_ = {! i0 ∧ i1!}
--}
+
+-- _ : I
+-- _ = {! i0 ∨ i0!}
+-- _ : I
+-- _ = {! i0 ∨ i1!}
+-- _ : I
+-- _ = {! i0 ∧ i0!}
+-- _ : I
+-- _ = {! i0 ∧ i1!}
+
 ```
 
 There are a few additional equalities which hold for `max` and `min`
