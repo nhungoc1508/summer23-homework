@@ -627,4 +627,29 @@ refl⊎ (inr b) = refl
     fro (inl a) (inl b) p = cong inl p -- also works: inl (p i) -- applies to both side
     fro (inr b) (inr a) p = cong inr p
 ```
-            
+
+## Paths for integers ℤ
+```
+-- Equality
+_≡ℤ_ : ℤ → ℤ → Type
+pos n ≡ℤ pos m = n ≡ℕ m
+pos n ≡ℤ negsuc m = ∅
+negsuc n ≡ℤ pos m = ∅
+negsuc n ≡ℤ negsuc m = n ≡ℕ m
+
+-- Reflexitivity
+≡ℤ-refl : {a : ℤ} → a ≡ℤ a
+≡ℤ-refl {pos n} = ≡ℕ-refl n
+≡ℤ-refl {negsuc n} = ≡ℕ-refl n
+
+-- iff
+≡iff≡ℤ : (a b : ℤ) → (a ≡ b) iffP (a ≡ℤ b)
+≡iff≡ℤ a b = (to a b), (fro a b)
+  where
+    to : (x y : ℤ) → (x ≡ y) → (x ≡ℤ y)
+    to x y p = subst (x ≡ℤ_) p ≡ℤ-refl
+
+    fro : (x y : ℤ) → (x ≡ℤ y) → (x ≡ y)
+    fro (pos n) (pos m) p = cong pos (≡iff≡ℕ n m .snd p) -- alt: snd (≡iff≡ℕ n m) p
+    fro (negsuc n) (negsuc m) p = cong negsuc (≡iff≡ℕ n m .snd p)
+``` 

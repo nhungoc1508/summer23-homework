@@ -415,7 +415,7 @@ and-equals : (a1 a2 b1 b2 : Bool)
   → (b1 ≡Bool b2)
   → (a1 and b1) ≡Bool (a2 and b2)
 -- Exercise:
-and-equals a1 a2 b1 b2 p q = {!!}
+and-equals a1 a2 b1 b2 p q = {! !}
 ```
 
 We can similarly define equality of natural numbers.
