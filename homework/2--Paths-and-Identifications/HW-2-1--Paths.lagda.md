@@ -154,6 +154,7 @@ for any element `x`, there is a constant path at `x`.
 ```
 refl : {A : Type ℓ} {x : A} → x ≡ x
 refl {x = x} i = x
+{-# INLINE refl #-}
 ```
 
 Interpreted as a statement about sameness, this means that `x` is the

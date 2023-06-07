@@ -64,6 +64,7 @@ _ = ~ i0
 
 sym : x ≡ y → y ≡ x
 sym p i = p (~ i) -- ? subst way to write sym?
+{-# INLINE sym #-}
 
 -- sym' : x ≡ y → y ≡ x
 -- sym' {x ≡ x} p = (subst {! λ z → z ≡ x !} {!  p !} {! refl  !})
@@ -344,29 +345,41 @@ Below we have drawn some more squares. Write them down in Cubical Agda
 below.
 
            p⁻¹
-       x - - - > x
+       y - - - > x
        ^         ^
      p |         | refl            ^
        |         |               j |
-       x — — — > y                 ∙ — >
+       x — — — > x                 ∙ — >
           refl                       i
 
 ```
+-- ———— Boundary ——————————————————————————————————————————————
+-- i = i0 ⊢ p j
+-- i = i1 ⊢ x = p i0
+-- j = i0 ⊢ x = p i0 | j = 0 -> 0 | j = false -> false
+-- j = i1 ⊢ p (~ i) | j = 1 -> ~i | j = true -> ~i
 connectionEx1 : (p : x ≡ y) → Square p refl refl (sym p)
 -- Exercise
-connectionEx1 p i j = {!!}
+-- connectionEx1 p i j = p (~ ({!  !} ∨ {!   !}))
+connectionEx1 p i j = p (j ∧ (~ i)) -- !!!
 ```
             p
-        y - - - > y
+        x - - - > y
         ^         ^
     p⁻¹ |         | refl            ^
         |         |               j |
-        y — — — > x                 ∙ — >
+        y — — — > y                 ∙ — >
            refl                       i
 ```
 connectionEx2 : (p : x ≡ y) → Square (sym p) refl refl p
+-- ———— Boundary ——————————————————————————————————————————————
+-- i = i0 ⊢ p (~ j) | i = true -> ~j
+-- i = i1 ⊢ y | i = false -> -- ?
+-- j = i0 ⊢ y
+-- j = i1 ⊢ p i
 -- Exercise
-connectionEx2 p i j = {!!}
+connectionEx2 p i j = p (i ∨ (~ j)) -- !!!
+-- alt: = connectionEx1 (sym p)
 ```
 
 Our definition of ℤ is a little janky and off kilter --- we treat the
