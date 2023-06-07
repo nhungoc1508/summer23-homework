@@ -217,6 +217,7 @@ compose : {A : Type} {B : Type} {C : Type}
     → (A → C)
 -- Exercise:
 compose g f = λ a → g (f a)
+-- Types: a : A, f : A → B, g : B → C
 -- Also works: compose g f a = g (f a)
 ```
 
@@ -234,7 +235,9 @@ flip : {A B C : Type}
      → (A → B → C)
      → (B → A → C)
 -- Exercise:
-flip h = λ b a → h a b
+-- flip h = λ b a → h a b -- previous solution
+flip f y x = f x y
+-- Types: f : A → B → C, x : A, y : B; f a : B → C
 
 -- Should use the provided function on the argument twice.
 apply-twice : {A : Type}
@@ -242,7 +245,7 @@ apply-twice : {A : Type}
      → A
      → A
 -- Exercise:
-apply-twice h a = h (h a)
+apply-twice h a = h (h a) -- previous solution
 -- ALternative:
 -- apply-twice f = f ∘ f
 -- apply-twice f a = (apply-twice f a)

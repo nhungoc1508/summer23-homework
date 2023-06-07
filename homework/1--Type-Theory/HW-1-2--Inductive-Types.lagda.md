@@ -284,6 +284,12 @@ data _⊎_ {ℓ ℓ' : _} (A : Type ℓ) (B : Type ℓ') : Type (ℓ-max ℓ ℓ
   inl : (a : A) → A ⊎ B
   inr : (b : B) → A ⊎ B
 ```
+-- ? My note starts
+The inl constructor takes an element a of type A and returns a value of
+type A ⊎ B, indicating that a belongs to A. Similarly, the inr constructor
+takes an element b of type B and returns a value of type A ⊎ B, indicating
+that b belongs to B.
+-- ? My note ends
 
 The recursion principle for the disjoint union is "dual" to the
 universal mapping property of the product that we saw at the end of
@@ -300,6 +306,15 @@ get a map `⊎-rec f g : A ⊎ B → C,`.
 ⊎-rec f g (inr b) = g b
 ```
 
+-- ? My note starts
+The definition of ⊎-rec consists of two cases. When the input is constructed
+using the inl constructor (indicating it belongs to A), the function applies
+f to the value a of type A obtained from the inl constructor. Similarly,
+when the input is constructed using the inr constructor (indicating it belongs
+to B), the function applies g to the value b of type B obtained from the
+inr constructor.
+-- ? My note ends
+
 Since a `Bool` is either `true` or `false`, we should be able to see
 `Bool` and the disjoint union of the set `{true}` (represented by `⊤`)
 and `{false}` (represented by another copy of `⊤`). We can construct
@@ -315,6 +330,34 @@ Bool→⊤⊎⊤ false = inr tt
 ⊤⊎⊤→Bool (inl _) = true
 ⊤⊎⊤→Bool (inr _) = false
 ```
+-- ? My note starts
+Bool→⊤⊎⊤: This function takes a Bool value (true or false) as input
+and returns a value of the disjoint union type ⊤ ⊎ ⊤. The purpose of
+this function is to map each Bool value to the corresponding element
+in the disjoint union.
+* When the input is true, the function maps it to the left side of
+the disjoint union (inl tt). Here, tt is the sole element of the unit
+type ⊤. So, inl tt represents the fact that true belongs to the left
+side of the disjoint union.
+* When the input is false, the function maps it to the right side of
+the disjoint union (inr tt). Again, tt represents the element of the
+unit type ⊤, and inr tt indicates that false belongs to the right side
+of the disjoint union.
+
+⊤⊎⊤→Bool: This function takes an element from the disjoint union ⊤ ⊎ ⊤
+as input and returns a Bool value (true or false). This function
+establishes the reverse mapping, allowing us to convert elements of
+the disjoint union back into Bool values.
+* When the input is constructed using the inl constructor (representing
+the left side of the disjoint union), the function returns true. The
+underscore _ is a placeholder, indicating that the specific value from
+the unit type ⊤ on the left side doesn't matter. Regardless of the value,
+it will be mapped to true.
+* When the input is constructed using the inr constructor (representing
+the right side of the disjoint union), the function returns false. Similarly,
+the underscore _ indicates that the specific value from the unit type ⊤
+on the right side doesn't matter. It will always be mapped to false.
+-- ? My note ends
 
 Clearly, if you turned a `Bool` into an element of `⊤ ⊎ ⊤` and then
 back into a Boolean using these maps, you'd get to where you started;
@@ -327,12 +370,40 @@ to equivalence, but again we can't yet fully express that.
 ```
 ∅⊎-to : ∀ {ℓ} (A : Type ℓ) → ∅ ⊎ A → A
 -- Exercise:
-∅⊎-to A (inr a) = a
+∅⊎-to A (inl ())
+∅⊎-to A (inr x) = x
 
 ∅⊎-fro : ∀ {ℓ} (A : Type ℓ) → A → ∅ ⊎ A
 -- Exercise:
 ∅⊎-fro A a = inr a
 ```
+-- ? My note starts
+∅⊎-to and ∅⊎-fro, which demonstrate the relationship between the disjoint
+union type ⊎ and the empty type ∅.
+
+∅⊎-to: This function takes a type A and an element of the disjoint union
+∅ ⊎ A as input and returns an element of type A. The purpose of this function
+is to extract a value of type A from the disjoint union.
+* When the input is constructed using the inl constructor, which represents
+the left side of the disjoint union (in this case, ∅), the function matches
+against the empty tuple () and returns an element of type A. Since the
+inl constructor for ∅ has no valid value, this case is unreachable. The empty
+type ∅ ensures that there are no elements present on the left side of the disjoint
+union, so there is no value to return.
+* When the input is constructed using the inr constructor, which represents
+the right side of the disjoint union (the type A), the function simply returns
+the element x of type A. This is the value that was originally present on the
+right side of the disjoint union.
+
+∅⊎-fro: This function takes a type A and an element of type A as input and
+returns an element of the disjoint union ∅ ⊎ A. The purpose of this function
+is to inject a value of type A into the disjoint union.
+Regardless of the input value a of type A, the function constructs an element
+of the disjoint union using the inr constructor, indicating that the value
+a belongs to the right side of the disjoint union. Since there are no valid
+values for the left side (the empty type ∅), this function does not require
+any specific value from the empty type.
+-- ? My note ends
 
 Now we can describe the integers. An integer is either a natural
 number or a strictly negative number, so we can turn this into an
