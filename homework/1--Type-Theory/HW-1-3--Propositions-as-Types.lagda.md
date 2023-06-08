@@ -284,13 +284,17 @@ functions with the same type.
 ```
 or→Type-to : (a b : Bool) →  Bool→Type (a or b) → ((Bool→Type a) ⊎ (Bool→Type b))
 -- Exercise:
-or→Type-to true true p = inl p
-or→Type-to true false p = inl p
-or→Type-to false true p = inr p
+or→Type-to true true tt = inl tt -- ? difference
+or→Type-to true false tt = inl tt
+or→Type-to false true tt = inr tt
+or→Type-to false false ()
 
 or→Type-to' : (a b : Bool) →  Bool→Type (a or b) → ((Bool→Type a) ⊎ (Bool→Type b))
 -- Exercise:
-or→Type-to' a b p = {!!}
+or→Type-to' true true tt = inr tt -- ? difference
+or→Type-to' true false tt = inl tt
+or→Type-to' false true tt = inr tt
+or→Type-to' false false ()
 ```
 
 This has to do with the fact that not every type should be thought of
@@ -316,6 +320,12 @@ recursion principles allowed us to define ordinary functions out of
 `Bool`, `ℕ`, etc., induction principles allow us to define *dependent*
 functions.
 
+-- ? My note starts
+Induction principles provide a systematic way to define dependent functions
+by reasoning about all possible values of a type. By using induction, we can
+prove properties or define functions that hold for all elements of a type.
+-- ? My note ends
+
 `Bool` is the easiest. There are only two cases, so we just have to
 upgrade the inputs to lie in type corresponding to each case:
 
@@ -325,8 +335,29 @@ Bool-ind : ∀ {ℓ} {C : Bool → Type ℓ}
          → (cfalse : C false)
          → ((b : Bool) → C b)
 -- Exercise:
-Bool-ind ctrue cfalse b = {!!}
+Bool-ind ctrue cfalse true = ctrue
+Bool-ind ctrue cfalse false = cfalse
 ```
+-- ? My note starts
+The induction principle for Bool, denoted as Bool-ind:
+* C : Bool → Type ℓ is a dependent type that represents the dependent function
+we want to define. It takes a Bool value as input and produces a type at
+level ℓ as the result. In other words, C is a family of types indexed by
+the values of Bool.
+* ctrue : C true -- specifies the result of the dependent function
+when the input is true.
+* cfalse : C false -- specifies the value of the result of the dependent
+function when the input is false.
+
+The induction principle Bool-ind states that if we can prove define the dependent
+function for both true and false, then it holds for any Bool value.
+
+Pattern matching:
+* If b is true, then the result is ctrue, which is the result of the
+dependent function when the input is true.
+* If b is false, then the result is cfalse, which is the result of the
+dependent function when the input is false.
+-- ? My note ends
 
 `A ⊎ B` is similar. In the recursion principle, the inputs were maps
 `A → C` and `B → C`. If `C` is now a type dependent on `A ⊎ B`, these
@@ -340,7 +371,8 @@ the input `a : A` or `b : B` respectively.
       → (cinr : (b : B) → C (inr b))
       → (x : A ⊎ B) → C x
 -- Exercise:
-⊎-ind cinl cinr x = {!!}
+⊎-ind cinl cinr (inl a) = cinl a
+⊎-ind cinl cinr (inr b) = cinr b
 ```
 
 `ℕ` is a little trickier. It is best to think of ordinary mathematical
@@ -359,8 +391,17 @@ If we can provide both of those things, then we get a function from
          → (csuc : (n : ℕ) → C n → C (suc n))
          → ((n : ℕ) → C n)
 -- Exercise:
-ℕ-ind czero csuc n = {!!}
+ℕ-ind czero csuc zero = czero
+ℕ-ind czero csuc (suc n) = csuc n (ℕ-ind czero csuc n)
 ```
+-- ? My note starts
+* czero : C zero specifies the value the dependent function
+when the input is zero.
+* csuc : (n : ℕ) → C n → C (suc n) specifies the inductive step.
+It states that for any natural number n, if we can prove that the
+function holds for n (i.e., C n), then we can also prove that
+it holds for the successor of n (i.e., suc n).
+-- ? My note ends
 
 As in recursion, we don't often need to use `Bool-ind`, `⊎-ind` or
 `ℕ-ind`; we can instead use the pattern-matching features of Agda
@@ -378,11 +419,14 @@ isZeroP n = Bool→Type (isZero n)
 
 evenOrOdd : (n : ℕ) → isEvenP n ⊎ isOddP n
 -- Exercise:
-evenOrOdd n = {!!}
+evenOrOdd zero = inl tt
+evenOrOdd (suc zero) = inr tt
+evenOrOdd (suc (suc n)) = evenOrOdd n
 
 zeroImpliesEven : (n : ℕ) → (isZeroP n) impliesP (isEvenP n)
 -- Exercise:
-zeroImpliesEven n = {!!}
+zeroImpliesEven zero = λ x → tt -- alt: zeroImpliesEven zero _ = tt
+zeroImpliesEven (suc n) ()
 ```
 
 # Equality
@@ -413,14 +457,24 @@ relation on Booleans.
   → a ≡Bool b
   → b ≡Bool a
 -- Exercise:
-≡Bool-sym a b p = {!!}
+≡Bool-sym true true tt = tt
+≡Bool-sym true false ()
+≡Bool-sym false true ()
+≡Bool-sym false false tt = tt
 
 ≡Bool-trans : (a b c : Bool)
   → a ≡Bool b
   → b ≡Bool c
   → a ≡Bool c
 -- Exercise:
-≡Bool-trans a b c p q = {!!}
+≡Bool-trans true true true tt tt = tt
+≡Bool-trans true true false tt ()
+≡Bool-trans true false true () q
+≡Bool-trans true false false () q
+≡Bool-trans false true true () q
+≡Bool-trans false true false () q
+≡Bool-trans false false true tt ()
+≡Bool-trans false false false tt tt = tt
 ```
 
 We can also show that all of our logical operations preserve the
@@ -431,14 +485,32 @@ not-equals : (a b : Bool)
   → a ≡Bool b
   → (not a) ≡Bool (not b)
 -- Exercise:
-not-equals a b p = {!!}
+not-equals true true tt = tt
+not-equals true false ()
+not-equals false true ()
+not-equals false false tt = tt
 
 and-equals : (a1 a2 b1 b2 : Bool)
   → (a1 ≡Bool a2)
   → (b1 ≡Bool b2)
   → (a1 and b1) ≡Bool (a2 and b2)
 -- Exercise:
-and-equals a1 a2 b1 b2 p q = {! !}
+and-equals true true true true tt tt = tt
+and-equals true true true false tt ()
+and-equals true true false true tt ()
+and-equals true true false false tt tt = tt
+and-equals true false true true () q
+and-equals true false true false () q
+and-equals true false false true () q
+and-equals true false false false () q
+and-equals false true true true () q
+and-equals false true true false () q
+and-equals false true false true () q
+and-equals false true false false () q
+and-equals false false true true tt tt = tt
+and-equals false false true false tt ()
+and-equals false false false true tt ()
+and-equals false false false false tt tt = tt
 ```
 
 We can similarly define equality of natural numbers.
@@ -446,7 +518,6 @@ We can similarly define equality of natural numbers.
 
 _≡ℕ_ : (n m : ℕ) → Type
 -- Exercise:
--- n ≡ℕ m = ?
 zero ≡ℕ zero = ⊤
 zero ≡ℕ suc m = ∅
 suc n ≡ℕ zero = ∅
@@ -461,7 +532,6 @@ symmetric, and transitive relation.
 ```
 ≡ℕ-refl : (n : ℕ) → n ≡ℕ n
 -- Exercise:
--- ≡ℕ-refl n = ?
 ≡ℕ-refl zero = tt
 ≡ℕ-refl (suc n) = ≡ℕ-refl n
 
@@ -469,14 +539,16 @@ symmetric, and transitive relation.
   → n ≡ℕ m
   → m ≡ℕ n
 -- Exercise:
-≡ℕ-sym n m p = {!!}
+≡ℕ-sym zero zero tt = tt
+≡ℕ-sym (suc n) (suc m) p = ≡ℕ-sym n m p
 
 ≡ℕ-trans : (n m k : ℕ)
   → n ≡ℕ m
   → m ≡ℕ k
   → n ≡ℕ k
 -- Exercise:
-≡ℕ-trans n m k p q = {!!}
+≡ℕ-trans zero zero zero tt tt = tt
+≡ℕ-trans (suc n) (suc m) (suc k) p q = ≡ℕ-trans n m k p q
 ```
 
 We can also show that all of the arithmetic operations preserve the
@@ -488,7 +560,8 @@ equality.
   → m1 ≡ℕ m2
   → (n1 + m1) ≡ℕ (n2 + m2)
 -- Exercise:
-+-≡ℕ n1 n2 m1 m2 p q = {!!}
++-≡ℕ zero zero m1 m2 p q = q
++-≡ℕ (suc n1) (suc n2) m1 m2 p q = +-≡ℕ n1 n2 m1 m2 p q
 ```
 
 ```
@@ -525,14 +598,17 @@ suc n ≤ℕ suc m = n ≤ℕ m
 
 ≤ℕ-refl : (n : ℕ) → n ≤ℕ n
 -- Exercise:
-≤ℕ-refl n = {!!}
+≤ℕ-refl zero = tt
+≤ℕ-refl (suc n) = ≤ℕ-refl n
 
 ≤ℕ-trans : (n m k : ℕ) (p : n ≤ℕ m) (q : m ≤ℕ k) → n ≤ℕ k
 -- Exercise:
-≤ℕ-trans n m k p q = {!!}
+≤ℕ-trans zero m k p q = tt
+≤ℕ-trans (suc n) (suc m) (suc k) p q = ≤ℕ-trans n m k p q
 
 ≤ℕ-antisym : (n m : ℕ) (p : n ≤ℕ m) (q : m ≤ℕ n) → n ≡ℕ m
 -- Exercise:
-≤ℕ-antisym n m p q = {!!}
+≤ℕ-antisym zero zero p q = tt
+≤ℕ-antisym (suc n) (suc m) p q = ≤ℕ-antisym n m p q
 ```
       
