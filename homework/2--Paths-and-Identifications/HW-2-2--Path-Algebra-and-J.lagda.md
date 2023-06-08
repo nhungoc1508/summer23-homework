@@ -435,7 +435,8 @@ fundamental but not so well known principle of identity: Martin Löf's
 J rule.
 
 ```
-J : (P : ∀ y → x ≡ y → Type ℓ) (r : P x refl)
+J : (P : ∀ y → x ≡ y → Type ℓ) -- P is called motive below
+    (r : P x refl) -- induction base case
     (p : x ≡ y) → P y p
 J P r p = transport (λ i → P (p i) (λ j → p (i ∧ j))) r
 ```
@@ -452,8 +453,8 @@ For comparison:
   to prove `B true` and `B false`.
 * Induction for `ℕ`: To prove `P n` for all `n : ℕ`, it suffices to
   prove `P zero`, and `P (suc n)` assuming that `P n`.
-* Induction for paths: To prove `P y p` for all paths `p`, it suffices
-  to prove `P x refl`.
+-- ** Induction for paths: To prove `P y p` for all paths `p`, it suffices
+-- *  to prove `P x refl`.
 
 The induction principle for `Bool` includes a convenient computation
 rule: if `f b : P b` is defined by induction from `x : P true` and `y
@@ -464,7 +465,7 @@ a path and not a definitional equality.
 
 ```
 transportRefl : (x : A) → transport refl x ≡ x
-transportRefl {A = A} x i = transp (λ _ → A) i x
+transportRefl {A = A} x i = transp (λ _ → A) i x -- using transp here and not transport
 
 JRefl : (P : ∀ y → x ≡ y → Type ℓ) (r : P x refl)
       → J P r refl ≡ r
@@ -485,13 +486,21 @@ iff→Iso p s r = iso (fst p) (snd p) s r
 ≡Iso≡Bool a b = iff→Iso (≡iff≡Bool a b) (s a b) (r a b)
   where
     s : (x y : Bool) → section (fst (≡iff≡Bool x y)) (snd (≡iff≡Bool x y))
-    s p = {!!}
+    -- p : x ≡Bool y
+    -- s x y p = ? -- pattern match on x, y, then p, normalize along the way
+    s true true tt = refl
+    s false false tt = refl
 
     r : (x y : Bool) → retract (fst (≡iff≡Bool x y)) (snd (≡iff≡Bool x y))
-    r true y p =  J motive refl p
+    r true y p = J motive base-case p -- J motive refl p
       where
-        motive : ∀ z q → Type
-        motive z q = {!!}
+        motive : ∀ y p → Type
+        -- z : Bool, q : true ≡ z, above^ it was y and p I think?
+        -- motive z q = snd (≡iff≡Bool true z) (fst (≡iff≡Bool true z) q) ≡ q
+        motive y p = snd (≡iff≡Bool true y) (fst (≡iff≡Bool true y) p) ≡ p
+
+        base-case : motive true refl
+        base-case = {!   !}
     r false y p = J motive refl p
       where
         motive : ∀ z q → Type
