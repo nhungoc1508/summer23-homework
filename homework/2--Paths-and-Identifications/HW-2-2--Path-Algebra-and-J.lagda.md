@@ -500,11 +500,14 @@ iff→Iso p s r = iso (fst p) (snd p) s r
         motive y p = snd (≡iff≡Bool true y) (fst (≡iff≡Bool true y) p) ≡ p
 
         base-case : motive true refl
-        base-case = {!   !}
-    r false y p = J motive refl p
+        base-case = refl
+    r false y p = J motive base-case p -- J motive refl p
       where
-        motive : ∀ z q → Type
-        motive z q = {!!}
+        motive : ∀ y p → Type
+        motive y p = snd (≡iff≡Bool false y) (fst (≡iff≡Bool false y) p) ≡ p
+
+        base-case : motive false refl
+        base-case = refl
 ```
 
 We similarly promote `≡iff≡ℕ` to an isomorphism, but it will be easier
@@ -530,8 +533,9 @@ codeℕ : ℕ → ℕ → Type
 codeℕ n m = n ≡ℕ m
 
 codeℕRefl : (n : ℕ) → codeℕ n n
-codeℕRefl zero = tt
-codeℕRefl (suc n) = codeℕRefl n
+codeℕRefl = ≡ℕ-refl
+-- codeℕRefl zero = tt
+-- codeℕRefl (suc n) = codeℕRefl n
 
 encodeℕ : (n m : ℕ) → n ≡ m → codeℕ n m
 encodeℕ n m p = subst (λ z → codeℕ n z) p (codeℕRefl n)
@@ -545,7 +549,8 @@ then it should be easy to map out of it.
 ```
 -- Exercise:
 decodeℕ : (n m : ℕ) → codeℕ n m → n ≡ m
-decodeℕ n m c = {!!}
+decodeℕ zero zero _ = refl
+decodeℕ (suc n) (suc m) c = cong suc (decodeℕ n m c) -- cong suc $ decodeℕ n m c
 ```
 
 Then we prove that `encode` and `decode` form an isomorphism. This
@@ -562,11 +567,22 @@ case.
 ≡Iso≡ℕ : (n m : ℕ) → Iso (n ≡ m) (n ≡ℕ m)
 ≡Iso≡ℕ n m = iso (encodeℕ n m) (decodeℕ n m) (s n m) (r n m)
   where
+    -- * Recall: encodeℕ uses subst & decodeℕ uses pattern matching
+
     s : (x y : ℕ) → section (encodeℕ x y) (decodeℕ x y)
-    s x y p = {!!}
+    s zero zero tt = refl -- λ i → tt
+    s (suc x) (suc y) p = s x y p
+
+    -- ? ==============
+    decodeℕ-encodeℕ-refl : ∀ {x} → decodeℕ x x (encodeℕ x x refl) ≡ refl 
+    decodeℕ-encodeℕ-refl {x} = {!!}
 
     r : (x y : ℕ) → retract (encodeℕ x y) (decodeℕ x y)
-    r x y p = {!!}
+    r x y p = J motive decodeℕ-encodeℕ-refl p
+      where
+        motive : ∀ y p → Type
+        motive y p = decodeℕ x y (encodeℕ x y p) ≡ p
+    -- ? ==============
 ```
 
 Let's do the encode-decode method again, but for coproducts.
@@ -597,4 +613,4 @@ Let's do the encode-decode method again, but for coproducts.
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = {!!}
 ```
- 
+    
