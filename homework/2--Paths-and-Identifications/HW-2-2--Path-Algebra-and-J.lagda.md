@@ -573,15 +573,19 @@ case.
     s zero zero tt = refl -- λ i → tt
     s (suc x) (suc y) p = s x y p
 
-    -- ? ==============
-    decodeℕ-encodeℕ-refl : ∀ {x} → decodeℕ x x (encodeℕ x x refl) ≡ refl 
-    decodeℕ-encodeℕ-refl {x} = {!!}
+    -- ? CHECK RECORDING
+    -- decodeℕ-encodeℕ-refl : ∀ {x} → decodeℕ x x (encodeℕ x x refl) ≡ refl 
+    -- decodeℕ-encodeℕ-refl {x} = {!!}
 
     r : (x y : ℕ) → retract (encodeℕ x y) (decodeℕ x y)
-    r x y p = J motive decodeℕ-encodeℕ-refl p
+    r x y p = J motive base-case p
       where
-        motive : ∀ y p → Type
-        motive y p = decodeℕ x y (encodeℕ x y p) ≡ p
+        motive : {x : ℕ} (y : ℕ) (p : x ≡ y) → Type
+        motive {x} y p = decodeℕ x y (encodeℕ x y p) ≡ p
+
+        base-case : {x : ℕ} → motive x refl
+        base-case {zero} = refl
+        base-case {suc x} i = cong suc ((base-case i))
     -- ? ==============
 ```
 
@@ -593,19 +597,23 @@ Let's do the encode-decode method again, but for coproducts.
 ≡Iso≡⊎ {A = A} {B = B} x y = iso (encode x y) (decode x y) (s x y) (r x y)
   where
     codeRefl : (c : A ⊎ B) → c ≡⊎ c
-    codeRefl c = {!!}
+    codeRefl (inl a) = refl
+    codeRefl (inr b) = refl
 
     encode : (x y : A ⊎ B) → x ≡ y → x ≡⊎ y
-    encode x y p = {!!}
+    encode x y p = subst (λ z → x ≡⊎ z) p (codeRefl x)
 
     encodeRefl : (c : A ⊎ B)  → encode c c refl ≡ codeRefl c
-    encodeRefl c = {!!}
+    encodeRefl (inl a) = {!   !}
+    encodeRefl (inr b) = {!   !}
 
     decode : (x y : A ⊎ B) → x ≡⊎ y → x ≡ y
-    decode x y p = {!!}
+    decode (inl a) (inl b) p = cong inl p
+    decode (inr b) (inr a) p = cong inr p
 
     decodeRefl : (c : A ⊎ B) → decode c c (codeRefl c) ≡ refl
-    decodeRefl c p = {!!}
+    decodeRefl (inl a) p = {!  !}
+    decodeRefl (inr b) p = {!  !}
 
     s : (x y : A ⊎ B) → section (encode x y) (decode x y)
     s x y = {!!}
@@ -613,4 +621,4 @@ Let's do the encode-decode method again, but for coproducts.
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = {!!}
 ```
-    
+      
