@@ -429,6 +429,27 @@ then negated):
 ℕ⊎ℕ→ℤ (inl a) = pos a
 ℕ⊎ℕ→ℤ (inr b) = negsuc b
 ```
+-- ? My note starts
+ℤ→ℕ⊎ℕ : ℤ → ℕ ⊎ ℕ maps integers (ℤ) to the disjoint union of two copies of the
+natural numbers (ℕ ⊎ ℕ). It establishes a correspondence between integers and
+the disjoint union representation.
+* When the input is constructed using the pos constructor, the function extracts
+the natural number n and maps it to the left side of the disjoint union (inl n).
+This indicates that pos n corresponds to a positive integer represented by n.
+* When the input is constructed using the negsuc constructor, the function extracts
+the natural number n and maps it to the right side of the disjoint union (inr n).
+This indicates that negsuc n corresponds to a strictly negative integer represented by n.
+
+ℕ⊎ℕ→ℤ : ℕ ⊎ ℕ → ℤ performs the inverse operation. It maps the disjoint union of
+two copies of the natural numbers (ℕ ⊎ ℕ) back to integers (ℤ).
+* When the input is constructed using the inl constructor, representing the left
+side of the disjoint union (positive numbers), the function extracts the natural number
+a and constructs a positive integer using the pos constructor (pos a).
+* When the input is constructed using the inr constructor, representing the right
+side of the disjoint union (strictly negative numbers), the function extracts the
+natural number b and constructs a strictly negative integer using the
+negsuc constructor (negsuc b).
+-- ? My note ends
 
 We can define the various arithmetic operations of the
 integers. First, we need a few helper functions. This one negates a

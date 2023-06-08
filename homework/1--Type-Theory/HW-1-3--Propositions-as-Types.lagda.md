@@ -72,7 +72,7 @@ think of some types as themselves expressing propositions. This idea
 is known as "propositions as types".
 
 # Propositions as Types
-
+-- * Important point starts
 The idea of "propositions as types" is that a proposition is a
 (certain kind of) type, and that to prove that proposition is to give
 an element of that type. We can turn the Booleans into types like so:
@@ -87,6 +87,20 @@ Bool→Type : Bool → Type₀
 Bool→Type true  = trueP
 Bool→Type false = falseP
 ```
+-- ? My note starts
+The Booleans are being turned into types by defining two types:
+trueP and falseP. The types trueP and falseP correspond to the
+propositions "true" and "false," respectively.
+
+* trueP : Type declares a type trueP to represent the proposition "true."
+It is defined as the unit type ⊤, which is a type that has a single
+value tt. The unit type is chosen to represent the proposition "true"
+because it has a unique inhabitant and is considered to be trivially true.
+* falseP : Type declares a type falseP to represent the proposition "false."
+It is defined as the empty type ∅, which has no valid values. The empty
+type is chosen to represent the proposition "false" because it lacks any
+inhabitants, indicating that the proposition is false and cannot be proven.
+-- ? My note ends
 
 So `Bool→Type` sends `true` to the type `⊤`, which has an element
 `tt`; under the interpretation that proofs of propositions are the
@@ -94,6 +108,7 @@ elements of the types representing those propositions, this means we
 can prove `true`. On the other hand, `false` gets sent to `∅`, which
 has no elements by definition. Therefore, we can't prove `false`
 --- at least, not without assuming some contradictory hypotheses.
+-- * Important point ends
 
 An amazing feature of the propositions-as-types idea is that the
 operations on types we have seen in the last two lectures become
@@ -136,9 +151,11 @@ the right, we use the corresponding operation on propostions-as-types.
 and→Type : (a b : Bool) → (Bool→Type (a and b)) iffP ((Bool→Type a) andP (Bool→Type b)) -- Bool→Type (a and b) → (Bool→Type a) × (Bool→Type b)
                                                                                         -- × ((Bool→Type a) × (Bool→Type b) → Bool→Type (a and b))
 -- Exercise:
--- and→Type true b = (λ p → tt , p) , (λ q → (snd q))
--- and→Type false b = (λ p → ∅-rec p) , (λ q → (fst q))
-and→Type true b = (λ p → tt , p) , λ q → snd q
+-- Done in class and works:
+-- and→Type true b = (λ p → tt , p) , λ q → snd q
+-- and→Type false b = (λ p → ∅-rec p) , λ q → fst q
+-- In revision:
+and→Type true b = (λ p → (tt , p)) , λ q → snd q
 and→Type false b = (λ p → ∅-rec p) , λ q → fst q
 
 -- Recall:
@@ -146,7 +163,7 @@ and→Type false b = (λ p → ∅-rec p) , λ q → fst q
 -- true ⇒ x  = x
 -- false ⇒ _    = true
 
-⇒→Type : (a b : Bool) → (Bool→Type (a ⇒ b)) iffP ((Bool→Type a) impliesP (Bool→Type b))
+-- ⇒→Type : (a b : Bool) → (Bool→Type (a ⇒ b)) iffP ((Bool→Type a) impliesP (Bool→Type b))
 -- (Bool→Type (a ⇒ b)) → (Bool→Type a → Bool→Type b)
 -- × (Bool→Type a → Bool→Type b) → (Bool→Type (a ⇒ b))
 -- Exercise:
@@ -180,11 +197,19 @@ and→Type false b = (λ p → ∅-rec p) , λ q → fst q
 -- --
 -- ⇒→Type false false = {!   !} , {!   !} 
 
--- Solutions (?)
-⇒→Type true b = (λ p → λ q → p) , λ f → f tt
+-- Solutions (?) in class
+-- ⇒→Type true b = (λ p → λ q → p) , λ f → f tt
 -- Alternative: ... = const , flip apply tt
-⇒→Type false b = (λ p → λ q → ∅-rec q) , λ f → tt
+-- ⇒→Type false b = (λ p → λ q → ∅-rec q) , λ f → tt
 -- Alternative: ... = λ _ → ∅-rec , const tt
+
+-- ? In revision:
+⇒→Type : (a b : Bool) → (Bool→Type (a ⇒ b)) iffP ((Bool→Type a) impliesP (Bool→Type b))
+-- (Bool→Type (a ⇒ b)) → (Bool→Type a → Bool→Type b)
+-- × (Bool→Type a → Bool→Type b) → (Bool→Type (a ⇒ b))
+⇒→Type true b = (λ p → λ q → p) , λ p → p tt
+⇒→Type false b = (λ p → λ q → ∅-rec q) , λ p → tt
+
 ```
 
 Negation can be seen as a special case of implication: not P is the same as P implies false.
@@ -248,12 +273,10 @@ straightforward:
 or→Type-fro : (a b : Bool) → ((Bool→Type a) ⊎ (Bool→Type b)) → Bool→Type (a or b)
 -- Exercise:
 -- or→Type-fro a b p = {! !}
--- or→Type-fro a b (inl x) = {!  !}
-or→Type-fro true b (inl x) = tt
--- x : Bool→Type a
-or→Type-fro true b (inr y) = tt
-or→Type-fro false b (inr y) = y
--- y : Bool→Type b
+or→Type-fro true true (inl x) = tt
+or→Type-fro true true (inr x) = tt
+or→Type-fro true false (inl x) = tt
+or→Type-fro false true (inr x) = tt
 ```
 
 In the other direction, however, we can define two *different*
@@ -512,4 +535,4 @@ suc n ≤ℕ suc m = n ≤ℕ m
 -- Exercise:
 ≤ℕ-antisym n m p q = {!!}
 ```
-    
+      
