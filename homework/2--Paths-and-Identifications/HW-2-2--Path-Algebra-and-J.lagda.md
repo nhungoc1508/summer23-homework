@@ -626,4 +626,4 @@ Let's do the encode-decode method again, but for coproducts.
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = J (λ y p → decode x y (encode x y p) ≡ p) (trans (cong (decode x x) (encodeRefl x)) (decodeRefl x))
 ```
--- !! Homework: encode - decode for integers
+-- !! Homework: encode - decode for integers (should use the first definition)

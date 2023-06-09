@@ -47,7 +47,7 @@ type-theoretically. For this, we use:
 
 ```
 ∃! : Type ℓ → Type ℓ
-∃! A = Σ[ x ∈ A ] (∀ y → x ≡ y)
+∃! A = Σ[ x ∈ A ] (∀ y → x ≡ y) -- * y : A
 ```
 
 In words, to give an element of `∃! A` we must give an element `x : A`
@@ -55,9 +55,10 @@ and then a function assigning to every `y : A` a path `x ≡ y`. This
 means that `A` has a unique element, where we are saying two elements
 are the same by virtue of the paths between them.
 
-Homotopically speaking, this means that the type `A` *contracts onto
-`x`*. So, if we have an element of `∃! A`, we say that `A` is
-*contractible*. This terminology is more common in homotopy type
+Homotopically speaking, this means that the type `A` -- *contracts
+onto `x`*. So, if we have an element of `∃! A`, we say that `A` is
+-- *contractible*.
+This terminology is more common in homotopy type
 theory, so we record it here as well.
 ```
 isContr : Type ℓ → Type ℓ
@@ -90,7 +91,13 @@ isContrSingl : (a : A) → isContr (singl a)
 isContrSingl a = (a , refl) , contract
   where
     contract : (y : singl a) → (a , refl) ≡ y
-    contract (x , p) = {!   !}
+    contract (x , p) = λ i → p i ,  λ j → p (i ∧ j)
+
+J' : {a : A} (motive : singl a → Type ℓ)
+     (r : motive (a , refl))
+     -----
+     → (x : singl a) → motive x
+J' {a = a} motive r x = subst motive (contraction (isContrSingl a) x) r
 ```
 
 We show that our type `⊤`, which was defined to have only a single
@@ -99,7 +106,7 @@ element `tt : ⊤`, is contractible.
 ```
 isContr⊤ : isContr ⊤
 -- Exercise
-isContr⊤ = {!!}
+isContr⊤ = tt , {!λ _ i → refl i!}
 ```
 
 Any two contractible types are isomorphic. As a corollary, any
@@ -371,4 +378,4 @@ graphEquivIsOneToOne (e , p) = {!!}
 ```
 
 We can also go the other way, but we'll need a few more tools in our toolbelt.
- 
+   
