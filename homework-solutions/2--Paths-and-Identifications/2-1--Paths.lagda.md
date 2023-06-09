@@ -1,4 +1,4 @@
-# Homework 2-1: Paths and the Interval
+ # Homework 2-1: Paths and the Interval
 ```
 module homework-solutions.2--Paths-and-Identifications.2-1--Paths where
 

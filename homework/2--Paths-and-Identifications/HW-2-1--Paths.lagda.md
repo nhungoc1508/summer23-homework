@@ -100,6 +100,14 @@ with `h(i0) = x` and `h(i1) = y`. Crucially, these will be
 *definitional* equalities; Agda will check that values of the function
 on `i0` and `i1` match exactly with the ones specified.
 
+-- ? My note starts
+A path is defined as a function h : I → S that maps the elements of I
+to a type S. This function h represents the path between two elements in S.
+In other words, given two elements x and y in S, the notion of sameness or
+equality between them, denoted as x ≡ y, is represented by a path
+function h such that h(i0) = x and h(i1) = y.
+-- ? My note ends
+
 However, `I` is not like other types since we don't intend it to
 represent a type of mathematical object. We are just using it as a
 tool to get at a notion of sameness. For that reason, we silo it in
@@ -172,7 +180,8 @@ proving some useful equalities.
 
 -- Exercise
 ∘-idˡ : (f : A → B) → f ∘ (λ a → a) ≡ f
-∘-idˡ f i x = f x
+-- ∘-idˡ f i x = f x
+∘-idˡ f i x = {!   !}
 
 -- Exercise
 ∘-idʳ : (f : A → B) → (λ b → b) ∘ f ≡ f

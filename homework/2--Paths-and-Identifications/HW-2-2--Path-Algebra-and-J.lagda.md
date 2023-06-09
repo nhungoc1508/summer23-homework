@@ -593,6 +593,7 @@ Let's do the encode-decode method again, but for coproducts.
 ```
 -- Exercise
 -- Hint: For r, you need to use transitivity.
+-- * trans : x ≡ y → y ≡ z → x ≡ z
 ≡Iso≡⊎ : {A B : Type} (x y : A ⊎ B) → Iso (x ≡ y) (x ≡⊎ y)
 ≡Iso≡⊎ {A = A} {B = B} x y = iso (encode x y) (decode x y) (s x y) (r x y)
   where
@@ -604,7 +605,7 @@ Let's do the encode-decode method again, but for coproducts.
     encode x y p = subst (λ z → x ≡⊎ z) p (codeRefl x)
 
     encodeRefl : (c : A ⊎ B)  → encode c c refl ≡ codeRefl c
-    encodeRefl (inl a) = {!   !}
+    encodeRefl (inl a) = {!  !}
     encodeRefl (inr b) = {!   !}
 
     decode : (x y : A ⊎ B) → x ≡⊎ y → x ≡ y
@@ -616,9 +617,10 @@ Let's do the encode-decode method again, but for coproducts.
     decodeRefl (inr b) p = {!  !}
 
     s : (x y : A ⊎ B) → section (encode x y) (decode x y)
-    s x y = {!!}
+    s (inl a) (inl a1) p = {!   !}
+    s (inr b) (inr b1) p = {!   !}
 
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = {!!}
 ```
-      
+       
