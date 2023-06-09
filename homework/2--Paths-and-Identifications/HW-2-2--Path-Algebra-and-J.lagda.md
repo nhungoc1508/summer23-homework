@@ -467,8 +467,8 @@ a path and not a definitional equality.
 transportRefl : (x : A) → transport refl x ≡ x
 transportRefl {A = A} x i = transp (λ _ → A) i x -- using transp here and not transport
 
-substRefl : {P : A → Type ℓ} {x : A} (y : P x) → subst P refl y ≡ y
-substRefl y = transportRefl y
+substRefl : (P : A → Type ℓ) {x : A} (y : P x) → subst P refl y ≡ y
+substRefl P y = transportRefl y
 
 JRefl : (P : ∀ y → x ≡ y → Type ℓ) (r : P x refl)
       → J P r refl ≡ r
@@ -599,6 +599,7 @@ Let's do the encode-decode method again, but for coproducts.
 -- * trans : x ≡ y → y ≡ z → x ≡ z
 ≡Iso≡⊎ : {A B : Type} (x y : A ⊎ B) → Iso (x ≡ y) (x ≡⊎ y)
 ≡Iso≡⊎ {A = A} {B = B} x y = iso (encode x y) (decode x y) (s x y) (r x y)
+-- ! TO BE REVISED
   where
     codeRefl : (c : A ⊎ B) → c ≡⊎ c
     codeRefl (inl a) = refl
@@ -608,23 +609,21 @@ Let's do the encode-decode method again, but for coproducts.
     encode x y p = subst (λ z → x ≡⊎ z) p (codeRefl x)
 
     encodeRefl : (c : A ⊎ B)  → encode c c refl ≡ codeRefl c
-    -- encodeRefl c = {! subst (x ≡⊎_) p (codeRefl x) !}
-    encodeRefl c = {! substRefl !}
+    encodeRefl c = substRefl (c ≡⊎_) (codeRefl c)
 
     decode : (x y : A ⊎ B) → x ≡⊎ y → x ≡ y
     decode (inl a) (inl b) p = cong inl p
     decode (inr b) (inr a) p = cong inr p
 
     decodeRefl : (c : A ⊎ B) → decode c c (codeRefl c) ≡ refl
-    decodeRefl (inl a) p = {!  !}
-    decodeRefl (inr b) p = {!  !}
+    decodeRefl (inl a) = refl
+    decodeRefl (inr b) = refl
 
     s : (x y : A ⊎ B) → section (encode x y) (decode x y)
     s (inl a) (inl a1) = J (λ a' p → encode (inl a) (inl a') (cong inl p) ≡ p) (encodeRefl (inl a))
     s (inr b) (inr b1) = J (λ b' p → encode (inr b) (inr b') (cong inr p) ≡ p) (encodeRefl (inr b))
-    -- todo: try extracting the motive out of this
 
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
-    r x y = {!!}
+    r x y = J (λ y p → decode x y (encode x y p) ≡ p) (trans (cong (decode x x) (encodeRefl x)) (decodeRefl x))
 ```
 -- !! Homework: encode - decode for integers

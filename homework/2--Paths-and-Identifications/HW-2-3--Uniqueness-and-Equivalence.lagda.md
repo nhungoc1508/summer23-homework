@@ -90,7 +90,7 @@ isContrSingl : (a : A) → isContr (singl a)
 isContrSingl a = (a , refl) , contract
   where
     contract : (y : singl a) → (a , refl) ≡ y
-    contract (x , p) = ?
+    contract (x , p) = {!   !}
 ```
 
 We show that our type `⊤`, which was defined to have only a single
