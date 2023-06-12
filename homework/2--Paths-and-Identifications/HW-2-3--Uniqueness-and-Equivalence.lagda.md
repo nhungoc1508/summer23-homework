@@ -4,7 +4,7 @@ module homework.2--Paths-and-Identifications.HW-2-3--Uniqueness-and-Equivalence 
 
 open import Cubical.Core.Primitives
 
-open import Cubical.Foundations.Function using (idfun; _∘_; const)
+open import Cubical.Foundations.Function using (idfun; _∘_; const; _$_)
 open import Cubical.Data.Sigma.Base using (_×_)
 
 open import homework.1--Type-Theory.HW-1-2--Inductive-Types
@@ -231,20 +231,6 @@ the fiber of the identity function over of point `a` is the singleton at
 choice to flip the direction of the path in the definition of
 fiber...).
 
--- ? Recall
-```
--- singl : {A : Type ℓ} → (a : A) → Type ℓ
--- singl {A = A} a = Σ[ x ∈ A ] a ≡ x
-
--- isContrSingl : (a : A) → isContr (singl a)
--- -- Exercise
--- isContrSingl a = (a , refl) , contract
---   where
---     contract : (y : singl a) → (a , refl) ≡ y
---     contract (x , p) = λ i → p i ,  λ j → p (i ∧ j)
-```
--- ?
-
 ```
 singl' : {A : Type} (a : A) → Type
 singl' {A = A} a = Σ[ x ∈ A ] (x ≡ a)
@@ -255,7 +241,7 @@ isContrSingl' a = (a , refl) , contract
   where
     contract : (y : singl' a) → (a , refl) ≡ y
     fst (contract (x , p) i) = p (~ i)
-    snd (contract (x , p) i) j = {!!}
+    snd (contract (x , p) i) j = p (j ∨ ~ i)
     -- ? ———— Boundary (snd):
     -- i = i0 ⊢ refl j
     -- i = i1 ⊢ p j
@@ -279,17 +265,20 @@ idEquiv A = idfun A , idIsEquiv A
 From any equivalence, we can extract an isomorphism.
 ```
 inv : {A B : Type} → A ≃ B → B → A
-inv e b = fst (center (snd e b))
+-- inv e b = fst (center (snd e b))
+-- inv (e , is-equiv) = fst ∘ fst ∘ is-equiv
+inv (e , is-equiv) b = fst (fst (is-equiv b))
 
 equivToIso : {A B : Type} → A ≃ B → Iso A B
 -- Exercise
-equivToIso e = iso (fst e) (inv e) (s e) (r e)
+equivToIso (e , is-equiv) = iso e (inv (e , is-equiv)) s r
   where
-    s : (e : A ≃ B) → section (fst e) (inv e)
-    s (e , is-equiv) y = {!!}
+    s : section e (inv (e , is-equiv))
+    s y = is-equiv y .fst .snd
 
-    r : (e : A ≃ B) → retract (fst e) (inv e)
-    r (e , is-equiv) x i = {!!}
+    r : retract e (inv (e , is-equiv))
+    -- r (y e , is-equiv) x i = {!!}
+    r x i = is-equiv (e x) .snd (x , refl) i .fst
 ```
 
 There is in fact a way to turn an iso into an equivalence as well, but
