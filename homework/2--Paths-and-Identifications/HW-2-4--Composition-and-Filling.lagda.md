@@ -92,7 +92,7 @@ entirely).
 Consider the function which divides a natural number evenly in two,
 for example.
 ```
--- ? halfOf : Σ[ n ∈ ℕ ] isEven n → ℕ -- think of it along currying
+-- ? halfOf : Σ[ n ∈ ℕ ] isTrue (isEven n) → ℕ -- think of it along currying
 halfOf : (n : ℕ) → BooleanPartial (isEven n) ℕ -- ? now φ depends on n
 halfOf zero = just zero                  -- half of 0 is 0
 halfOf (suc zero) = nothing              -- half of 1 is not defined
@@ -145,8 +145,11 @@ suc n ≤ zero = false
 suc n ≤ suc m = n ≤ m
 
 take : (n : ℕ) (L : List A) → BooleanPartial (n ≤ length L) (List A)
+-- ? Take n elems of a list → a new, partially defined list
 -- Exercise
-take n L = {!!}
+take zero L = just []
+take (suc n) [] = nothing
+take (suc n) (x :: L) = (x ::_) ∘ (take n L)
 ```
 
 ## Partial elements
