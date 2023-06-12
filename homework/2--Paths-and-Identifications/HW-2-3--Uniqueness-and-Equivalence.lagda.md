@@ -1,5 +1,6 @@
 # Homework 2-3: Uniqueness and Equivalence
 ```
+-- {-# OPTIONS --allow-unsolved-metas #-}
 module homework.2--Paths-and-Identifications.HW-2-3--Uniqueness-and-Equivalence where
 
 open import Cubical.Core.Primitives
@@ -278,7 +279,8 @@ equivToIso (e , is-equiv) = iso e (inv (e , is-equiv)) s r
 
     r : retract e (inv (e , is-equiv))
     -- r (y e , is-equiv) x i = {!!}
-    r x i = is-equiv (e x) .snd (x , refl) i .fst
+    -- r x i = is-equiv (e x) .snd (x , refl) i .fst -- works
+    r x = cong fst ((contraction $ is-equiv (e x)) (x , refl))
 ```
 
 There is in fact a way to turn an iso into an equivalence as well, but

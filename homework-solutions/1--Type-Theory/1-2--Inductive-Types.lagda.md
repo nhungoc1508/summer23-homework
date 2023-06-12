@@ -3,7 +3,7 @@
 module homework-solutions.1--Type-Theory.1-2--Inductive-Types where
 
 open import Cubical.Foundations.Prelude
-open import homework.1--Type-Theory.1-1--Types-and-Functions
+open import homework.1--Type-Theory.HW-1-1--Types-and-Functions
 
 ```
 Topics Covered:

@@ -9,7 +9,7 @@ open import homework.1--Type-Theory.HW-1-2--Inductive-Types
 open import homework.1--Type-Theory.HW-1-3--Propositions-as-Types
 open import homework.2--Paths-and-Identifications.HW-2-1--Paths
 open import homework.2--Paths-and-Identifications.HW-2-2--Path-Algebra-and-J
-open import homework.2--Paths-and-Identifications.HW-2-3--Uniqueness-and-Equivalence
+open import homework-solutions.2--Paths-and-Identifications.2-3--Uniqueness-and-Equivalence
 
 
 private
@@ -55,6 +55,7 @@ exists only conditionally, with the condition being some Boolean `φ`.
 ```
 BooleanPartial : Bool → Type → Type
 BooleanPartial φ A = IsTrue φ → A
+-- if φ then A else ⊤
 ```
 
 Any fully defined element of `A` is also a partially defined one: if
@@ -91,7 +92,8 @@ entirely).
 Consider the function which divides a natural number evenly in two,
 for example.
 ```
-halfOf : (n : ℕ) → BooleanPartial (isEven n) ℕ
+-- ? halfOf : Σ[ n ∈ ℕ ] isEven n → ℕ -- think of it along currying
+halfOf : (n : ℕ) → BooleanPartial (isEven n) ℕ -- ? now φ depends on n
 halfOf zero = just zero                  -- half of 0 is 0
 halfOf (suc zero) = nothing              -- half of 1 is not defined
 halfOf (suc (suc n)) = suc ∘ (halfOf n)  -- half of (n + 2) is one more than half of n.
@@ -462,7 +464,7 @@ Path-ish {A} endpoints = (i : I) → A [ ∂ i ↦ endpoints i ]
 Given a partial element `e : (i : I) → Partial (∂ i) A` defined only
 when `i = i0` or `i = i1` --- the endpoints of our path --- we get a
 "strict set" (element of `SSet`) consisting of the functions
-`p : I → A' where by definition `p i0 = endpoints i0` and
+`p : I → A` where by definition `p i0 = endpoints i0` and
 `p i1 = endpoints i1`.
 
 The path type isn't exactly the same thing as our `Path-ish` above,

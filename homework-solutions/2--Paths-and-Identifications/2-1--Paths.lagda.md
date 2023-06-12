@@ -5,9 +5,9 @@ module homework-solutions.2--Paths-and-Identifications.2-1--Paths where
 open import Cubical.Core.Primitives public
 open import Cubical.Data.Sigma.Base
 
-open import homework.1--Type-Theory.1-1--Types-and-Functions
-open import homework.1--Type-Theory.1-2--Inductive-Types
-open import homework.1--Type-Theory.1-3--Propositions-as-Types
+open import homework-solutions.1--Type-Theory.1-1--Types-and-Functions
+open import homework-solutions.1--Type-Theory.1-2--Inductive-Types
+open import homework-solutions.1--Type-Theory.1-3--Propositions-as-Types
 ```
 
 Aside: This block lets us refer to some arbitrary types `A`, `B`, ... and
