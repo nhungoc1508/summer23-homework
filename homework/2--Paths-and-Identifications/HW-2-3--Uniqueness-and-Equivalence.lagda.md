@@ -193,7 +193,7 @@ from homotopy theory. Here are the usual names in type theory:
 First, we define the "fiber" of a function f : A → B, which is the
 type theoretic name for "inverse image". In homotopy theory, this
 would be called the "homotopy fiber".
-
+-- Fiber over y → pair
 ```
 fiber : {A : Type ℓ} {B : Type ℓ'} (f : A → B) (y : B) → Type (ℓ-max ℓ ℓ')
 fiber {A = A} f y = Σ[ x ∈ A ] (f x ≡ y)
@@ -231,6 +231,20 @@ the fiber of the identity function over of point `a` is the singleton at
 choice to flip the direction of the path in the definition of
 fiber...).
 
+-- ? Recall
+```
+-- singl : {A : Type ℓ} → (a : A) → Type ℓ
+-- singl {A = A} a = Σ[ x ∈ A ] a ≡ x
+
+-- isContrSingl : (a : A) → isContr (singl a)
+-- -- Exercise
+-- isContrSingl a = (a , refl) , contract
+--   where
+--     contract : (y : singl a) → (a , refl) ≡ y
+--     contract (x , p) = λ i → p i ,  λ j → p (i ∧ j)
+```
+-- ?
+
 ```
 singl' : {A : Type} (a : A) → Type
 singl' {A = A} a = Σ[ x ∈ A ] (x ≡ a)
@@ -240,7 +254,19 @@ isContrSingl' : {A : Type} (a : A) → isContr (singl' a)
 isContrSingl' a = (a , refl) , contract
   where
     contract : (y : singl' a) → (a , refl) ≡ y
-    contract (x , p) i = {!!}
+    fst (contract (x , p) i) = p (~ i)
+    snd (contract (x , p) i) j = {!!}
+    -- ? ———— Boundary (snd):
+    -- i = i0 ⊢ refl j
+    -- i = i1 ⊢ p j
+    -- j = i0 ⊢ p (~ i)
+    -- j = i1 ⊢ a
+    -- ? ———— Deduction:
+    -- i0 j0: p (~i0) = p(i1) = a
+    -- At i0: refl j (a → a) -> i0 j1 = a
+    -- At i1: p (x≡A) -> i1 j0 = x ; i1 p1 = a
+    -- At j0: p sym (a → x)
+    -- At j1: refl (a → a)
 
 idIsEquiv : (A : Type) → isEquiv (idfun A)
 idIsEquiv A = λ y → isContrSingl' y

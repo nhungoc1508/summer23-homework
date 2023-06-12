@@ -355,9 +355,9 @@ below.
 ```
 -- ———— Boundary ——————————————————————————————————————————————
 -- i = i0 ⊢ p j
--- i = i1 ⊢ x = p i0
--- j = i0 ⊢ x = p i0 | j = 0 -> 0 | j = false -> false
--- j = i1 ⊢ p (~ i) | j = 1 -> ~i | j = true -> ~i
+-- i = i1 ⊢ x (refl j) = p i0
+-- j = i0 ⊢ x (refl i) = p i0 | j = 0 -> 0 | j = false -> false
+-- j = i1 ⊢ p (~ i) (sym p i) | j = 1 -> ~i | j = true -> ~i
 connectionEx1 : (p : x ≡ y) → Square p refl refl (sym p)
 -- Exercise
 -- connectionEx1 p i j = p (~ ({!  !} ∨ {!   !}))
@@ -373,9 +373,9 @@ connectionEx1 p i j = p (j ∧ (~ i)) -- !!!
 ```
 connectionEx2 : (p : x ≡ y) → Square (sym p) refl refl p
 -- ———— Boundary ——————————————————————————————————————————————
--- i = i0 ⊢ p (~ j) | i = true -> ~j
--- i = i1 ⊢ y | i = false -> -- ?
--- j = i0 ⊢ y
+-- i = i0 ⊢ sym p j = p (~ j) | i = true -> ~j
+-- i = i1 ⊢ refl j = y | i = false -> -- ?
+-- j = i0 ⊢ refl i = y
 -- j = i1 ⊢ p i
 -- Exercise
 connectionEx2 p i j = p (i ∨ (~ j)) -- !!!
@@ -626,4 +626,8 @@ Let's do the encode-decode method again, but for coproducts.
     r : (x y : A ⊎ B) → retract (encode x y) (decode x y)
     r x y = J (λ y p → decode x y (encode x y p) ≡ p) (trans (cong (decode x x) (encodeRefl x)) (decodeRefl x))
 ```
+
 -- !! Homework: encode - decode for integers (should use the first definition)
+```
+
+```
