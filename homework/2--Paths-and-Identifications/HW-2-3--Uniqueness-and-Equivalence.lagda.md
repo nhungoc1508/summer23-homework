@@ -106,7 +106,13 @@ element `tt : ⊤`, is contractible.
 ```
 isContr⊤ : isContr ⊤
 -- Exercise
-isContr⊤ = tt , {!λ _ i → refl i!}
+-- One option:
+isContr⊤ = tt , contract
+  where
+    contract : (y : ⊤) → tt ≡ y
+    contract tt = refl
+-- Alternative:
+-- isContr⊤ = tt , λ {! { tt → refl }  !} -- ! Why error
 ```
 
 Any two contractible types are isomorphic. As a corollary, any
@@ -169,7 +175,7 @@ snd (isContrFun c) f i a = {!!}
 ```
 
 In particular, there is a unique map `A → ⊤`.
-
+-- ! HOMEWORK UNTIL HERE
 ## Equivalences
 
 In set theory, a bijection between sets $A$ and $B$ is a function

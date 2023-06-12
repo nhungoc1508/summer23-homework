@@ -180,8 +180,7 @@ proving some useful equalities.
 
 -- Exercise
 ∘-idˡ : (f : A → B) → f ∘ (λ a → a) ≡ f
--- ∘-idˡ f i x = f x
-∘-idˡ f i x = {!   !}
+∘-idˡ f i x = f x
 
 -- Exercise
 ∘-idʳ : (f : A → B) → (λ b → b) ∘ f ≡ f
@@ -196,16 +195,15 @@ notnot false = refl {x = false}
 
 -- or properties
 or-zeroˡ : ∀ x → true or x ≡ true
-or-zeroˡ x = refl
+or-zeroˡ _ = refl
 
 or-zeroʳ : ∀ x → x or true ≡ true
 or-zeroʳ true = refl
 or-zeroʳ false = refl
--- Look at OG definition of _or_
 
 or-identityˡ : ∀ x → false or x ≡ x
--- or-identityˡ x = λ i → x
-or-identityˡ x = refl
+-- or-identityˡ x = refl
+or-identityˡ _ = refl
 
 or-identityʳ : ∀ x → x or false ≡ x
 or-identityʳ true = refl
@@ -218,14 +216,9 @@ or-comm false true = refl
 or-comm false false = refl
 
 or-assoc     : ∀ x y z → x or (y or z) ≡ (x or y) or z
-or-assoc true true true = refl
-or-assoc true true false = refl
-or-assoc true false true = refl
-or-assoc true false false = refl
-or-assoc false true true = refl
-or-assoc false true false = refl
-or-assoc false false true = refl
-or-assoc false false false = refl
+or-assoc true y z = refl
+or-assoc false y z = refl
+-- (y or z ≡ y or z)
 
 or-idem      : ∀ x → x or x ≡ x
 or-idem true = refl
@@ -241,10 +234,9 @@ the "Law of Excluded Middle": `b or (not b)`.)
 Types of paths are types like any other, so we can define functions
 that accept paths as arguments and produce paths as results.
 ```
-cong : (f : A → B) -- congruent?
+cong : (f : A → B)
   → (x ≡ y)
   → f x ≡ f y
--- cong f p i = f (p i)
 cong f p i = f (p i)
 ```
 This is the principle that says that doing the same thing to both
@@ -265,7 +257,8 @@ cong-∘ : (f : A → B) (g : B → C)
   → cong (g ∘ f) p ≡ cong g (cong f p)
 -- Exercise:
 -- Path between path
-cong-∘ f g p i j = g (f (p j)) -- !!! REVISE
+-- cong-∘ f g p i j = g (f (p j)) -- this works
+cong-∘ f g p = refl
 ```
 
 ## Paths in Pairs and Function Types
@@ -281,36 +274,62 @@ so ignoring the endpoints, the first is asking for a function `(I → A)
 function, and it turns out the obvious definition has the correct
 endpoints.
 
+-- ? My note starts
+≡-× takes two paths, one mapping I to type A and the other mapping
+I to type B, and combines them to form a new function that maps I
+to type A × B.
+
+≡-fst takes a path between two pairs and extracts the path
+between their first components.
+
+≡-snd takes a path between two pairs and extracts the path
+between their second components.
+-- ? My note ends
+
 ```
 ≡-× : {x y : A × B} → (fst x ≡ fst y) × (snd x ≡ snd y) → x ≡ y
 -- Exercise:
-≡-× (p , q) i = p i , q i
+≡-× (p , q) i = (p i) , (q i)
 
 ≡-fst : {x y : A × B} → x ≡ y → (fst x ≡ fst y)
 -- Exercise:
--- ≡-fst p i = fst (p i) -- This works
-≡-fst p = cong fst p -- Also works
+-- ≡-fst p = cong fst p -- This also works
+≡-fst p i = fst (p i)
 
 ≡-snd : {x y : A × B} → x ≡ y → (snd x ≡ snd y)
 -- Exercise:
-≡-snd p i = snd (p i) -- ? I think
+≡-snd p i = snd (p i)
 ```
 
 Similarly, what is a path in a function type? It is a function landing
 in paths!
 
+-- ? My note starts
+Function type (A → B): a path in this type can be thought of as a function
+that maps the interval to paths between the corresponding values in the codomain.
+
+funExt: takes in an input function h mapping each x in A to a path between f x and g x.
+It then returns a path proving the equality between f and g.
+h itself is already of the type (x : A) → f x ≡ g x.
+
+funExt⁻: takes in an input path p proving the equality between f and g. It then
+returns a function that maps each x in A to a path between f x and g x.
+-- ? My note ends
+
 ```
 funExt : {f g : A → B}
   → ((x : A) → f x ≡ g x)
-  → f ≡ g
+  -- if, for every input x : A, there exists a path between outputs f x and g x
+  → f ≡ g -- then f and g are themselves equal
 -- Exercise:
 funExt h i x = h x i
 
 funExt⁻ : {f g : A → B}
-  → f ≡ g
+  → f ≡ g -- if f and g are equal functions
   → ((x : A) → f x ≡ g x)
+  -- then there exists a function that maps each input x to a path between f x and g x
 -- Exercise:
-funExt⁻ h x i = h i x
+funExt⁻ p x i = p i x
 ```
 This is the principle of "function extensionality": to say that `f`
 equals `g` means that for all `x`, `f x` equals `g x`.
@@ -349,10 +368,14 @@ a section and a retract of `f`.
 module _ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'} where
   section : (f : A → B) → (g : B → A) → Type ℓ'
   section f g = ∀ b → f (g b) ≡ b
+  -- Given an elem of type B, applying f to the corresponding elem in A
+  -- (g b) yields the original elem
 
   -- NB: `g` is the retraction!
   retract : (f : A → B) → (g : B → A) → Type ℓ
   retract f g = ∀ a → g (f a) ≡ a
+  -- Given an elem of type A, applying g to the corresponding elem in B
+  -- (f a) yields the original elem
 
 -- This defines a record type
 -- Record types are like pair types, but more than two components.
@@ -362,8 +385,8 @@ record Iso {ℓ ℓ'} (A : Type ℓ) (B : Type ℓ') : Type (ℓ-max ℓ ℓ') w
   no-eta-equality
   constructor iso
   field
-    fun : A → B
-    inv : B → A
+    fun : A → B -- f
+    inv : B → A -- g
     rightInv : section fun inv
     leftInv  : retract fun inv
 ```
@@ -371,46 +394,95 @@ record Iso {ℓ ℓ'} (A : Type ℓ) (B : Type ℓ') : Type (ℓ-max ℓ ℓ') w
 In section 1-2, we had a few "bijections" between types - now we can
 show that these are really isomorphisms:
 
+-- ? My note starts
+Iso-Bool-⊤⊎⊤ is proving that the type Bool is isomorphic to the coproduct
+type ⊤ ⊎ ⊤. An isomorphism between two types establishes an equivalence
+or sameness of data between the two types. This means that we can transform
+data of type Bool into data of type ⊤ ⊎ ⊤ and vice versa, while preserving
+all relevant properties.
+By showing that the composition of Bool→⊤⊎⊤ followed by ⊤⊎⊤→Bool (or vice versa)
+results in the identity function, the isomorphism confirms that Bool and ⊤ ⊎ ⊤
+are indeed equivalent in terms of the data they contain.
+-- ? My note ends
 ```
 -- Exercise:
 -- s x = ?
 -- r x = ?
 Iso-Bool-⊤⊎⊤ : Iso Bool (⊤ ⊎ ⊤)
 Iso-Bool-⊤⊎⊤ = iso Bool→⊤⊎⊤ ⊤⊎⊤→Bool s r
+-- * fun = Bool→⊤⊎⊤ : Bool → ⊤ ⊎ ⊤
+-- * inv = ⊤⊎⊤→Bool : ⊤ ⊎ ⊤ → Bool
+-- * -> A = Bool, B = ⊤ ⊎ ⊤
+-- * s = section fun inv = ∀ b → fun (inv b) ≡ b
+-- * r = retract fun inv = ∀ a → inv (fun a) ≡ a
   where
-    s : section Bool→⊤⊎⊤ ⊤⊎⊤→Bool -- Function from Bool to Path
+    s : section Bool→⊤⊎⊤ ⊤⊎⊤→Bool
+    -- ? This is proving that f ∘ g = id
     s (inl tt) = refl
     s (inr tt) = refl
 
+    -- ? This is proving that g ∘ f = id
     r : retract Bool→⊤⊎⊤ ⊤⊎⊤→Bool
     r true = refl
     r false = refl
+```
 
+-- ? My note starts
+Iso-∅⊎ establishes an isomorphism between the coproduct type ∅ ⊎ A
+and the type A. This proves that the type ∅ ⊎ A containing either
+an element of ∅ (the empty type) or an element of A is equivalent
+to the type A itself.
+-- ? My note ends
+```
 -- Exercise:
 -- s x = ?
 -- r x = ?
 Iso-∅⊎ : ∀ {ℓ} (A : Type ℓ) → Iso (∅ ⊎ A) A
 Iso-∅⊎ A = iso (∅⊎-to A) (∅⊎-fro A) s r
+-- * fun = ∅⊎-to A : ∅ ⊎ A → A
+-- * inv = ∅⊎-fro A : A → ∅ ⊎ A
+-- * -> A = ∅ ⊎ A, B = A
+-- * s = section fun inv = ∀ b → fun (inv b) ≡ b -- type A
+-- * r = retract fun inv = ∀ a → inv (fun a) ≡ a -- type ∅ ⊎ A
   where
     s : section (∅⊎-to A) (∅⊎-fro A)
     s x = refl
 
     r : retract (∅⊎-to A) (∅⊎-fro A)
-    r (inr a) i = inr a
+    -- r (inr a) i = inr a
+    r (inr b) = λ i → inr b
+```
 
+-- ? My note starts
+Iso-ℤ-ℕ⊎ℕ establishes an isomorphism between the integer type ℤ
+and the coproduct type ℕ ⊎ ℕ. This proves that the set of integers
+and the set of pairs of natural numbers (ℕ ⊎ ℕ) are equivalent.
+-- ? My note ends
+```
 -- Exercise:
 -- s x = ?
 -- r x = ?
 Iso-ℤ-ℕ⊎ℕ : Iso ℤ (ℕ ⊎ ℕ)
 Iso-ℤ-ℕ⊎ℕ = iso ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ s r
+-- * fun = ℤ→ℕ⊎ℕ : ℤ → ℕ ⊎ ℕ
+-- * inv = ℕ⊎ℕ→ℤ : ℕ ⊎ ℕ → ℤ
+-- * -> A = ℕ, B = ℕ ⊎ ℕ
+-- * s = section fun inv = ∀ b → fun (inv b) ≡ b -- type ℕ ⊎ ℕ
+-- * = ℤ→ℕ⊎ℕ (ℕ⊎ℕ→ℤ [ℕ ⊎ ℕ]) -> ℕ⊎ℕ
+-- * r = retract fun inv = ∀ a → inv (fun a) ≡ a -- type ℕ
+-- * = ℕ⊎ℕ→ℤ (ℤ→ℕ⊎ℕ [ℕ]) -> ℕ
   where
     s : section ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ
-    s (inl a) i = inl a
-    s (inr a) i = inr a
+    -- s (inl a) i = inl a
+    -- s (inr a) i = inr a
+    s (inl a) = refl
+    s (inr b) = refl
 
     r : retract ℤ→ℕ⊎ℕ ℕ⊎ℕ→ℤ
-    r (pos n) i = pos n
-    r (negsuc n) i = negsuc n
+    -- r (pos n) i = pos n
+    -- r (negsuc n) i = negsuc n
+    r (pos n) = refl
+    r (negsuc n) = refl
 ```
 
 Not all isomorphisms will be so trivial. This one we need to construct
@@ -422,14 +494,20 @@ recursively.
 -- r x = ?
 Iso-ℕ-List⊤ : Iso ℕ (List ⊤)
 Iso-ℕ-List⊤ = iso ℕ→List⊤ length s r
+-- * fun = ℕ→List⊤ : ℕ → List ⊤
+-- * inv = length : List ⊤ → ℕ
+-- * -> A = ℕ, B = List ⊤
+-- * s = section fun inv = ∀ b → fun (inv b) ≡ b -- type List ⊤
+-- * = ℕ→List⊤ (length [List ⊤]) → List ⊤
+-- * r = retract fun inv = ∀ a → inv (fun a) ≡ a -- type ℕ
+-- * = length (ℕ→List⊤ [ℕ]) → ℕ
   where
     s : section ℕ→List⊤ length
-    s [] = λ i → [] -- ? alt: refl
+    s [] = refl
     -- s (tt :: L) = λ i → tt :: (s L i) -- this works
     s (tt :: L) = cong (tt ::_) (s L)
 
     r : retract ℕ→List⊤ length
-    -- r zero = λ i → zero -- this works
     r zero = refl
     r (suc x) = λ i → suc (r x i) -- ? try to see if there's alt
 ```
@@ -497,8 +575,27 @@ able to "continuously move" an element `a : A i0` to some element of
 Cubical Agda axiomatizes this idea with a function called `transp`:
 
 `transp : ∀ (A : (i : I) (φ : I) → Type) (a : A i0) → A i1`
+-- ? My note starts
+A represents a family of types indexed by the interval I. Given a type
+family A, an element a of type A at i0, and a path i0 ≡ i1 within the
+interval, the transp function transports the element a along the path
+to obtain an element of type A at i1.
+-- ? My note ends
 
 The function transp is slightly more general than what we need (we'll see what role the φ plays later in Part 2). What we really need is this function called "transport":
+
+-- ? My note starts
+transport:
+- Input: equality p : A ≡ B between two types A and B, type A
+- Goal: transport an element a from A to B along this equality
+(output: element of type B)
+
+- Input to transp:
+  + type family (λ i → p i) - dependent type indexed by the
+    interval I and parameterized by the path p.
+  + index i0 - start of the interval, indicating the source type A
+  + a is the element of type A that we want to transport
+-- ? My note ends
 ```
 transport : {A B : Type ℓ} → A ≡ B → A → B -- path + elem of first type -> elem of second type
 transport p a = transp (λ i → p i) i0 a
@@ -662,4 +759,4 @@ negsuc n ≡ℤ negsuc m = n ≡ℕ m
     fro : (x y : ℤ) → (x ≡ℤ y) → (x ≡ y)
     fro (pos n) (pos m) p = cong pos (≡iff≡ℕ n m .snd p) -- alt: snd (≡iff≡ℕ n m) p
     fro (negsuc n) (negsuc m) p = cong negsuc (≡iff≡ℕ n m .snd p)
-``` 
+```  
