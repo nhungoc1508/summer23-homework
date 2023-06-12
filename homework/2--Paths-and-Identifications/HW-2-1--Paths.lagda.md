@@ -615,9 +615,18 @@ Using substitution, we can show that there is no path from `true` to
 ```
 true≢false : ¬ true ≡ false -- ¬ == implies empty
 true≢false p = subst (λ b → true ≡Bool b) p tt -- OG
--- Recall:
+-- ? Recall:
+-- _≡Bool_ : (a b : Bool) → Type
 -- true ≡Bool true = ⊤
 -- true ≡Bool false = ∅
+-- ? My notes
+-- * subst B [dep. type] p [x ≡ y] pa [B x] → [B y]
+-- = subst B p tt
+-- B : true ≡Bool true = ⊤ & true ≡Bool false = ∅
+-- p : true ≡ false
+-- pa : tt = element of type ⊤ → B x = true ≡Bool [true] [this is x]
+-- → Replace x [true] with y [false] (because p : true ≡ false)
+-- * → B y = true ≡Bool false = ∅
 ```
 
 Let's take a minute to make sure we really understand what's going on
@@ -638,7 +647,15 @@ Give it a try in the reverse:
 ```
 false≢true : ¬ false ≡ true
 -- Exercise
-false≢true p = subst (λ b → false ≡Bool b) p tt
+false≢true p = subst (λ a → false ≡Bool a) p tt
+-- ? My notes
+-- false ≡Bool true = ∅
+-- false ≡Bool false = ⊤
+-- * subst B [dep. type] p [x ≡ y] pa [B x] → [B y]
+-- * Goal: false ≡ true → ∅
+-- Needs B s.t. replacing x [false] with y [true] causes B y = false
+-- B y [true] = false ⇔ B : false ≡Bool [true] = ∅ → B : false ≡Bool _
+-- pa : B x = false ≡Bool [false] = element of ⊤ = tt
 ```
 
 
@@ -652,8 +669,8 @@ the same thing as the equalities we define in 1-3!
   where
     to : (x y : Bool) → (x ≡ y) → (x ≡Bool y)
     to true true = λ _ → tt
-    to true false = true≢false
-    to false true = false≢true
+    to true false = true≢false -- ? true ≡ false → ∅
+    to false true = false≢true -- ? false ≡ true → ∅
     to false false = λ _ → tt
 
     fro : (x y : Bool) → (x ≡Bool y) → (x ≡ y)
@@ -669,6 +686,7 @@ can, but we will need some theory developed in the next lecture. If
 you're curious, give it a shot and see where you get stuck.
 
 We can do the same for the other equalities we covered in 1-3.
+-- ! Still need to revise from this point to the end
 ```
 -- Exercise
 -- to x y p = ?
@@ -680,7 +698,7 @@ We can do the same for the other equalities we covered in 1-3.
     to zero zero p = tt
     -- to zero (suc y) p = subst isZeroP p tt -- works
     to zero (suc y) p = subst (λ z → zero ≡ℕ z) p tt
-    to (suc x) zero p = subst ((suc x) ≡ℕ_) p (≡ℕ-refl x)
+    to (suc x) zero p = subst (λ z → suc x ≡ℕ z) p (≡ℕ-refl x)
     to (suc x) (suc y) p = to x y (cong predℕ p)
 
     to' : (x y : ℕ) → (x ≡ y) → (x ≡ℕ y)
