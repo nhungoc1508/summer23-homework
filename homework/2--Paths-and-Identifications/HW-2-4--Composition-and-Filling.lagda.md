@@ -522,7 +522,7 @@ Finally, we can understand the type of `hfill`. We have, roughly speaking,
 
 "`hfill (the (partially defined) side of the box over a point in the base)
         (a (full) element of the base extending the bottom of the sides)
-        (an element of the interval, "pointing up")`"
+        (an element of the interval, 'pointing up')`"
 
 
 For some inscrutable reason, the definition used in the Cubical
@@ -563,10 +563,10 @@ the box in this definition. The following code should be a fine way to
 define the composite:
 
 ```
-{- Error!
-_∙∙_ : x ≡ y → y ≡ z → x ≡ z
-(p ∙∙ q) i = hcomp (λ { j (i = i1) → q j }) (p i)
--}
+-- Error!
+-- _∙∙_ : x ≡ y → y ≡ z → x ≡ z
+-- (p ∙∙ q) i = hcomp (λ { j (i = i1) → q j }) (p i)
+
 ```
 The problem here is that this also has to fill in the left side of the
 box, and when it does it gets `hcomp (λ ()) x` in the top left
@@ -610,6 +610,7 @@ diamond : (p : x ≡ y) (q : y ≡ z) → Square p q p q
 To construct this via an `hcomp`, we need to cook up a cube (using an
 extra dimension `k`) with this square as the top face, and where we
 already know fillers for all the remaining sides.
+-- ? See handwritten notes
 
                           q
                 y - - - - - - - - > z
@@ -660,13 +661,14 @@ one.)
 ```
 diamondFaces : {x y z : A} (p : x ≡ y) (q : y ≡ z) → (i : I) → (j : I) → I → Partial (∂ i ∨ ∂ j) A
 -- Exercise
-diamondFaces p q i j k (i = i0) = {!!}
-diamondFaces p q i j k (i = i1) = {!!}
-diamondFaces p q i j k (j = i0) = {!!}
-diamondFaces p q i j k (j = i1) = {!!}
+diamondFaces p q i j k (i = i0) = p j -- Sq refl refl p p
+diamondFaces p q i j k (i = i1) = q (j ∧ k) -- Sq refl q refl q -- ? const in k
+diamondFaces p q i j k (j = i0) = p i -- Sq refl refl p p
+diamondFaces p q i j k (j = i1) = q (i ∧ k) -- Sq refl q refl q
 
 -- Exercise
-diamond p q i j = hcomp (diamondFaces p q i j) {!!}
+diamond p q i j = hcomp (diamondFaces p q i j) (p (i ∨ j))
+-- ? bottom face = Sq p refl p refl = p (i ∨ j)
 ```
 
 This is not the only way to do it! The composition problems that
@@ -693,15 +695,16 @@ same `diamond` square, but using the following cube:
 ```
 diamondFacesAlt : {x y z : A} (p : x ≡ y) (q : y ≡ z) → (i : I) → (j : I) → I → Partial (∂ i ∨ ∂ j) A
 -- Exercise
-diamondFacesAlt p q i j k (i = i0) = {!!}
-diamondFacesAlt p q i j k (i = i1) = {!!}
-diamondFacesAlt p q i j k (j = i0) = {!!}
-diamondFacesAlt p q i j k (j = i1) = {!!}
+diamondFacesAlt p q i j k (i = i0) = p (j ∧ k) -- Sq refl p refl p
+diamondFacesAlt p q i j k (i = i1) = compPath-filler p q j k -- Sq p (p ∙ q) refl q
+diamondFacesAlt p q i j k (j = i0) = p (i ∧ k) -- Sq refl p refl p
+diamondFacesAlt p q i j k (j = i1) = compPath-filler p q i k -- Sq p (p ∙ q) refl q
 
 diamondAlt : (p : x ≡ y) (q : y ≡ z) → Square p q p q
-diamondAlt {x = x} p q i j = {!!}
+diamondAlt {x = x} p q i j = hcomp (diamondFacesAlt p q i j) x
+-- bottom face = Sq refl refl refl refl
 ```
-
+-- ! Homework: (assoc & unit, and last one if possible)
 Let's set about proving associativity for path composition. To prove
 associativity, we will use the same trick as above and construct a
 cube whose top face is the path-between-paths that we want.
