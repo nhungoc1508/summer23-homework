@@ -186,7 +186,7 @@ We can see that `i ∨ ~ i` really behaves like the part of the interval
 consisting only of the endpoints by defining a `Partial` element on it:
 ```
 --- trueOrFalse is the function on {i0, i1} to Bool which sends i0 to true and i1 to false.
-trueOrFalse : (i : I) → Partial (i ∨ ~ i) Bool
+trueOrFalse : (i : I) → Partial (i ∨ ~ i) Bool -- ? defined at i0 or i1
 trueOrFalse i (i = i0) = true
 trueOrFalse i (i = i1) = false
 ```
@@ -238,10 +238,11 @@ the box, or the bottom of the box. So our `φ i j` will be the "union"
    right-of-box : I → I → I
    bottom-of-box : I → I → I
 ```
+-- ? ... = 1
 Now, `i` and `j` are in the left of the box just when `i = i0`, or in
 other words when `~ i = i1`. So
 ```
-   left-of-box i j = ~ i
+   left-of-box i j = ~ i -- ? = 1 iff i = i0
 ```
 Similarly, `i` and `j` are in the right of the box when `i = i1`, so
 ```
@@ -267,12 +268,22 @@ Try it yourself: describe a formula which gives the two sides of a box
 ```
 sides-of-square : I → I → I
 -- Exercise
-sides-of-square i j = {!!}
+-- ? My first solution
+-- sides-of-square i j = (left-of-box i j) ∨ (right-of-box i j)
+--   where
+--     left-of-box : I → I  → I
+--     left-of-box i j = ~ i -- i = i0 → needs 1 → ~ i
+    
+--     right-of-box : I → I → I
+--     right-of-box i j = i -- i = i1
+
+-- ? Solution
+sides-of-square i j = ∂ i -- ? i ∨ ~ i
 ```
 
 How about a three dimensional example. Come up with a formula to
 describe this part of the cube consisting of the bottom face and three
-of the sides.
+of the sides. -- ? With the shading as well -- the sides are not hollow
 
                 .                   .
               / ^                 / ^
@@ -292,7 +303,35 @@ of the sides.
 ```
 exercise-shape : I → I → I → I
 -- Exercise
-exercise-shape i j k = {!!}
+exercise-shape i j k = (bottom-of-cube i j k) ∨ (left-of-cube i j k) ∨ (front-of-cube i j k) ∨ (right-of-cube i j k)
+  where
+    bottom-of-cube : I → I → I → I -- k = k0
+    bottom-of-cube i j k = ~ k
+    
+    left-of-cube : I → I → I → I -- i = i0
+    left-of-cube i j k = ~ i
+
+    front-of-cube : I → I → I → I -- j = j0 
+    front-of-cube i j k = ~ j
+    
+    right-of-cube : I → I → I → I -- i = i1
+    right-of-cube i j k = i
+
+exercise-shape-wireframe : I → I → I → I -- ? hollow sides
+exercise-shape-wireframe i j k = (bottom-of-cube i j k) ∨ (left-of-cube i j k) ∨ (front-of-cube i j k) ∨ (right-of-cube i j k)
+-- ? When extended, should = union of all the individual edges (?)
+  where
+    bottom-of-cube : I → I → I → I -- k = k0
+    bottom-of-cube i j k = ~ k ∧ (∂ i ∨ ∂ j)
+    
+    left-of-cube : I → I → I → I -- i = i0
+    left-of-cube i j k = ~ i ∧ (∂ j ∨ ∂ k)
+
+    front-of-cube : I → I → I → I -- j = j0 
+    front-of-cube i j k = ~ j ∧ (∂ i ∨ ∂ k)
+    
+    right-of-cube : I → I → I → I -- i = i1
+    right-of-cube i j k = i ∧ (∂ j ∨ ∂ k)
 ```
 
 ## Extensibility and Composition
@@ -342,7 +381,7 @@ We want to cap off this box to get a path `w ≡ z`. To do this, we need
 to put it in another form which we can apply `hcomp`. Speaking
 loosely, we will have
 
-* `hcomp (the sides of the box) (the full bottom face) = (the full top face)`
+-- * `hcomp (the sides of the box) (the full bottom face) = (the full top face)`
 
 
 Here, the sides of the box are a partial path in the context of
@@ -355,7 +394,7 @@ Here, the sides of the box are a partial path in the context of
           x         y          ∙ — >
                                  i
 ```
-doubleComp-sides : {x y z w : A } (r : x ≡ w) (q : y ≡ z)
+doubleComp-sides : {x y z w : A } (r : w ≡ x) (q : y ≡ z)
                    (i j : I) → Partial (∂ i) A
 -- doubleComp-faces r q is a partial square defined only on ∂ i
 doubleComp-sides r q i j (i = i0) =
@@ -460,7 +499,7 @@ is a function `I → A` about which we know that `p i0 = x` and
 `p i1 = y`. Using extension types, we could write this as
 
 ```
-Path-ish : ∀ {A} (endpoints : (i : I) → Partial (∂ i) A) → SSet
+Path-ish : ∀ {A} (endpoints : (i : I) → Partial (∂ i) A) → SSet -- strict set
 Path-ish {A} endpoints = (i : I) → A [ ∂ i ↦ endpoints i ]
 ```
 
