@@ -730,13 +730,15 @@ cube whose top face is the path-between-paths that we want.
 assoc-faces : {w x y z : A} (r : w ≡ x) (p : x ≡ y) (q : y ≡ z) → (i : I) → (j : I) → (k : I) → Partial (∂ i ∨ ∂ j) A
 -- Exercise
 assoc-faces         r p q i j k (i = i0) = {!!}
+-- = Square refl q (r ∙ p) (r ∙ (p ∙ q))
 assoc-faces         r p q i j k (i = i1) = {!!}
-assoc-faces {w = w} r p q i j k (j = i0) = {!!}
-assoc-faces         r p q i j k (j = i1) = {!!}
+assoc-faces {w = w} r p q i j k (j = i0) = w
+assoc-faces         r p q i j k (j = i1) = q k
+-- = Square q q refl refl
 
 assoc-base : {w x y z : A} (r : w ≡ x) (p : x ≡ y) (q : y ≡ z) → Square (r ∙ p) (r ∙ p) refl refl
 -- Exercise
-assoc-base r p q i j = {!!}
+assoc-base r p q i j = (r ∙ p) j
 
 assoc : (r : w ≡ x) (p : x ≡ y) (q : y ≡ z)
   → r ∙ (p ∙ q) ≡ (r ∙ p) ∙ q
@@ -778,18 +780,22 @@ To cancel on the left we have to build another cube.
                 refl
 
 The faces are straightforward to construct if you stare at the diagram.
-Rather nicely, `hcomps` are *uniform*. That means that if we do an `hcomp` on some shape and then restrict to a subshape, the result is the same as restricting and doing the `hcomp` there. In the above cube, since the `i = i1` face is exactly the square from the `hcomp` defining `refl ∙ p`, we can omit it from our final `hcomp`.
+Rather nicely, `hcomps` are *uniform*. That means that if we do an `hcomp`
+on some shape and then restrict to a subshape, the result is the same as
+restricting and doing the `hcomp` there. In the above cube, since the
+`i = i1` face is exactly the square from the `hcomp` defining `refl ∙ p`,
+we can omit it from our final `hcomp`.
 ```
 lUnit-faces : {x y : A} (p : x ≡ y) → (i : I) → (j : I) → (k : I) → Partial (~ i ∨ ∂ j) A
-lUnit-faces         p i j k (i = i0) = {!!} -- Constant in the `j` direction
+lUnit-faces         p i j k (i = i0) = p j -- Constant in the `j` direction
 -- We can omit the (i = i1) direction, since it will be filled in
 -- by the appropriate value
-lUnit-faces {x = x} p i j k (j = i0) = {!!} -- Completely constant
-lUnit-faces         p i j k (j = i1) = {!!} -- Constructed from `p` using connections
+lUnit-faces {x = x} p i j k (j = i0) = x -- Completely constant
+lUnit-faces         p i j k (j = i1) = p (k ∨ (~ i)) -- Constructed from `p` using connections
 
 lUnit-base : {x y : A} (p : x ≡ y) → Square p refl refl (sym p)
 -- Hint: Constructed from `p` using connections in a different way
-lUnit-base p i j = {!!}
+lUnit-base p i j = p (j ∧ (~ i))
 
 lUnit : (p : x ≡ y) → p ≡ refl ∙ p
 lUnit {x = x} p i j = hcomp (lUnit-faces p i j) (lUnit-base p i j)
