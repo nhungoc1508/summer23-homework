@@ -86,9 +86,15 @@ We would like to define a form of transitivity for paths, to mirror
 the transitivity of equality. Here is a reasonable definition:
 
 ```
-trans : x ≡ y → y ≡ z → x ≡ z -- ? note this is transitivity and not transport
+trans : x ≡ y → y ≡ z → x ≡ z
 -- This is currently not very computationally fast
-trans {x = x} p q = subst (λ k → x ≡ k) q p -- TODO: revise
+trans {x = x} p q = subst (λ k → x ≡ k) q p
+-- ? My notes
+-- p : x ≡ y -- B x [pa]
+-- q : y ≡ z -- p
+-- Replace y in p with z (from q)
+-- → B y : x ≡ z
+-- → B : x ≡ _
 ```
 
 However, it would be difficult to reason about the paths-between-paths
@@ -107,6 +113,15 @@ paths-between-paths as functions of two interval variables `i` and
 don't let ourselves form the type `I × I`, we can nevertheless think
 of a function of two interval variables as giving a function out of a
 square.
+
+-- ? My note starts
+A square where the sides represent the intervals i and j. The function
+a takes a point i on the horizontal side of the square and assigns
+a function (j : I) → A to that point. So, for each value of i, we have
+a function that depends on the value of j. This corresponds to a path
+between paths, where the outer path is parameterized by i and the
+inner path is parameterized by j.
+-- ? My note ends
 
             a-1
        a01 - - - > a11
@@ -147,6 +162,27 @@ functions `p : (i : I) → A i`; we call these paths over the path
 `A`. The name for this in Cubical Agda is `PathP`, for Path (over)
 P(ath).
 
+-- ? My note starts
+A path is a function p : I → A, where I is an interval and A is a type.
+This function p gives us a way to traverse the interval I and obtain
+values of type A at different points along the interval.
+
+Consider a situation where the type A itself varies along the interval I.
+This means that for each point i in the interval, we have a different
+type A i. In other words, A is a type family indexed by the interval I.
+
+A path over a path is a way to describe how values of a particular type B
+change as we move along the interval I. More specifically, a path over
+a path gives us a dependent function that maps each point i in the interval I
+to a value of type B i, where B is a type family that depends on A.
+
+Suppose we have a type family A : I → Type that represents a path of types.
+Let's say we want to describe how values of type B change along this path.
+We can define a function p : (i : I) → B (A i), where p i gives us the value
+of type B corresponding to the type A i at the point i in the interval.
+This function p represents a path over the path of types A.
+-- ? My note ends
+
 ```
 path-over-path : (A : I → Type) (a : A i0) (b : A i1) → Type
 path-over-path A a b = PathP A a b
@@ -165,7 +201,7 @@ exactly the missing ingredient for describing paths in these types.
 There are actually two places dependency could show up here. The first
 is the obvious one, when `B` depends on `A`. The definitions are the
 same as in the non-dependent case, so try to fill in the `PathP` type.
-
+-- ! Still don't understand this
 ```
 module _ {A : Type ℓ} {B : A → Type ℓ'}
   {x y : Σ A B}
@@ -271,13 +307,13 @@ definitionally.
 -- Uncomment this block and try normalising the following expressions.
 
 -- _ : I
--- _ = {! i0 ∨ i0!}
+-- _ = {! i0 ∨ i0!} -- ? i0
 -- _ : I
--- _ = {! i0 ∨ i1!}
+-- _ = {! i0 ∨ i1!} -- ? i1
 -- _ : I
--- _ = {! i0 ∧ i0!}
+-- _ = {! i0 ∧ i0!} -- ? i0
 -- _ : I
--- _ = {! i0 ∧ i1!}
+-- _ = {! i0 ∧ i1!} -- ? i0
 
 ```
 
@@ -287,6 +323,8 @@ that Cubical Agda axiomatizes for `∧` and `∨` (again, definitionally):
 * Top and Bottom:
   `i0 ∧ j = i0`   and  `i0 ∨ j = j`
   `i1 ∧ j = j`    and  `i1 ∨ j = i1`
+-- ? min(i0, i0) = i0 & max(i0, j) = j
+-- ? min(i1, j) = j & max(i1, j) = i1
 * Idempotence:
   `i ∧ i = i`     and   `i ∨ i = i`
 * Commutativity:
@@ -630,4 +668,4 @@ Let's do the encode-decode method again, but for coproducts.
 -- !! Homework: encode - decode for integers (should use the first definition)
 ```
 
-```
+``` 
