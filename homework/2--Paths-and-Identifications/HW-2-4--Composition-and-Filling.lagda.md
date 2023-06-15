@@ -816,12 +816,16 @@ isContrisContr≡ : {A : Type ℓ} (c : isContr A) (a b : A) → isContr (a ≡ 
 -- Hint: You should use an `hcomp` for both halves. Draw them out!
 -- Hint 2: In the second component, you only need three sides of a cube.
 -- fst (isContrisContr≡ (c₀ , c) a b) i = {! hcomp (λ { j (i = i0) → a ; j (i = i1) → ((sym (c a)) ∙ (c b)) j }) a !}
-
--- isContrisContr-faces : {!!}
 -- lUnit-faces : {x y : A} (p : x ≡ y) → (i : I) → (j : I) → (k : I) → Partial (~ i ∨ ∂ j) A
--- isContrisContr-faces = {!!}
 
 -- fst (isContrisContr≡ (c₀ , c) a b) i = (sym (c a) ∙ (c b)) i
 fst (isContrisContr≡ (c₀ , c) a b) i = hcomp (λ { j (i = i0) → c a j ; j (i = i1) → c b j }) c₀
-snd (isContrisContr≡ (c₀ , c) a b) p i j = {!  !}
-```
+-- snd (isContrisContr≡ (c₀ , c) a b) p i j = hcomp (isContrisContr-faces p i j) (isContrisContr-base p i j)
+  -- where
+  --   isContrisContr-faces : {!   !}
+  --   isContrisContr-faces = {!   !}
+
+  --   isContrisContr-base : {!   !} → Square refl refl refl refl
+  --   isContrisContr-base = {!   !}
+snd (isContrisContr≡ (c₀ , c) a b) p i j = {! !}
+``` 
