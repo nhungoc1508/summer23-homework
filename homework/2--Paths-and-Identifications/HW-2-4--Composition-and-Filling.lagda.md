@@ -815,17 +815,10 @@ Here's an open ended problem that requires using two `hcomps`. Try and figure ou
 isContrisContr≡ : {A : Type ℓ} (c : isContr A) (a b : A) → isContr (a ≡ b)
 -- Hint: You should use an `hcomp` for both halves. Draw them out!
 -- Hint 2: In the second component, you only need three sides of a cube.
--- fst (isContrisContr≡ (c₀ , c) a b) i = {! hcomp (λ { j (i = i0) → a ; j (i = i1) → ((sym (c a)) ∙ (c b)) j }) a !}
--- lUnit-faces : {x y : A} (p : x ≡ y) → (i : I) → (j : I) → (k : I) → Partial (~ i ∨ ∂ j) A
-
--- fst (isContrisContr≡ (c₀ , c) a b) i = (sym (c a) ∙ (c b)) i
 fst (isContrisContr≡ (c₀ , c) a b) i = hcomp (λ { j (i = i0) → c a j ; j (i = i1) → c b j }) c₀
--- snd (isContrisContr≡ (c₀ , c) a b) p i j = hcomp (isContrisContr-faces p i j) (isContrisContr-base p i j)
-  -- where
-  --   isContrisContr-faces : {!   !}
-  --   isContrisContr-faces = {!   !}
-
-  --   isContrisContr-base : {!   !} → Square refl refl refl refl
-  --   isContrisContr-base = {!   !}
-snd (isContrisContr≡ (c₀ , c) a b) p i j = {! !}
-``` 
+snd (isContrisContr≡ (c₀ , c) a b) p i j =
+  hcomp (λ { k (i = i1) → c (p j) k -- Square (c a) (c b) c₀ p
+           ; k (j = i0) → c a k -- Square (c a) (c a) c₀ a
+           ; k (j = i1) → c b k}) -- Square (c b) (c b) c₀ b
+        c₀ -- Bottom face
+```  
