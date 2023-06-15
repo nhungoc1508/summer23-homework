@@ -704,7 +704,6 @@ diamondAlt : (p : x ≡ y) (q : y ≡ z) → Square p q p q
 diamondAlt {x = x} p q i j = hcomp (diamondFacesAlt p q i j) x
 -- bottom face = Sq refl refl refl refl
 ```
--- ! Homework: (assoc & unit, and last one if possible)
 Let's set about proving associativity for path composition. To prove
 associativity, we will use the same trick as above and construct a
 cube whose top face is the path-between-paths that we want.
@@ -729,9 +728,10 @@ cube whose top face is the path-between-paths that we want.
 ```
 assoc-faces : {w x y z : A} (r : w ≡ x) (p : x ≡ y) (q : y ≡ z) → (i : I) → (j : I) → (k : I) → Partial (∂ i ∨ ∂ j) A
 -- Exercise
-assoc-faces         r p q i j k (i = i0) = {!!}
+assoc-faces         r p q i j k (i = i0) = (r ∙ (compPath-filler p q k)) j
 -- = Square refl q (r ∙ p) (r ∙ (p ∙ q))
-assoc-faces         r p q i j k (i = i1) = {!!}
+assoc-faces         r p q i j k (i = i1) = compPath-filler (r ∙ p) q k j -- !
+-- = Square refl q (r ∙ p) ((r ∙ p) ∙ q)
 assoc-faces {w = w} r p q i j k (j = i0) = w
 assoc-faces         r p q i j k (j = i1) = q k
 -- = Square q q refl refl
@@ -787,7 +787,7 @@ restricting and doing the `hcomp` there. In the above cube, since the
 we can omit it from our final `hcomp`.
 ```
 lUnit-faces : {x y : A} (p : x ≡ y) → (i : I) → (j : I) → (k : I) → Partial (~ i ∨ ∂ j) A
-lUnit-faces         p i j k (i = i0) = p j -- Constant in the `j` direction
+lUnit-faces         p i j k (i = i0) = p j -- Constant in the `k` direction
 -- We can omit the (i = i1) direction, since it will be filled in
 -- by the appropriate value
 lUnit-faces {x = x} p i j k (j = i0) = x -- Completely constant
@@ -803,9 +803,25 @@ lUnit {x = x} p i j = hcomp (lUnit-faces p i j) (lUnit-base p i j)
 
 Here's an open ended problem that requires using two `hcomps`. Try and figure out what boxes you should try and close off to solve it.
 
+             
+        a         b
+        ^         ^
+   c a  |         | c b
+        |         |
+        c₀ - — — > c₀
+             c₀
+
 ```
 isContrisContr≡ : {A : Type ℓ} (c : isContr A) (a b : A) → isContr (a ≡ b)
 -- Hint: You should use an `hcomp` for both halves. Draw them out!
 -- Hint 2: In the second component, you only need three sides of a cube.
-isContrisContr≡ (c₀ , c) a b = {!!} , {!!}
+-- fst (isContrisContr≡ (c₀ , c) a b) i = {! hcomp (λ { j (i = i0) → a ; j (i = i1) → ((sym (c a)) ∙ (c b)) j }) a !}
+
+-- isContrisContr-faces : {!!}
+-- lUnit-faces : {x y : A} (p : x ≡ y) → (i : I) → (j : I) → (k : I) → Partial (~ i ∨ ∂ j) A
+-- isContrisContr-faces = {!!}
+
+-- fst (isContrisContr≡ (c₀ , c) a b) i = (sym (c a) ∙ (c b)) i
+fst (isContrisContr≡ (c₀ , c) a b) i = hcomp (λ { j (i = i0) → c a j ; j (i = i1) → c b j }) c₀
+snd (isContrisContr≡ (c₀ , c) a b) p i j = {!  !}
 ```
