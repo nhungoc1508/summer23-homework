@@ -342,7 +342,10 @@ isPropRetract :
   → (h : retract f g)
   → isProp B → isProp A
 -- Exercise
-isPropRetract f g h isPropB x y i = {!!}
+isPropRetract f g h isPropB x y i = 
+  hcomp (λ { j (i = i0) → h x j 
+           ; j (i = i1) → h y j }) 
+        (cong g (isPropB (f x) (f y)) i)
 ```
 
 And similarly for contractible types:
