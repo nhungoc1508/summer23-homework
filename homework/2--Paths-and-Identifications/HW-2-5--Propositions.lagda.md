@@ -258,7 +258,7 @@ isPropFun : {A : Type ℓ} {B : A → Type ℓ'}
             (p : ∀ a → isProp (B a))
           → isProp (∀ a → B a)
 -- Exercise
-isPropFun p f g = {!!}
+isPropFun p f g i a = p a (f a) (g a) i
 ```
 
 As a special case of "for all", we get "implies". If `A` and `B` are
@@ -280,9 +280,16 @@ fst (isContr→ (cB , hB)) = λ _ → cB
 snd (isContr→ (cB , hB)) f i a = hB (f a) i
 ```
 
+```
+-- ? =====
+isPropisEquiv : (f : A → B) → isProp ((y : B) → isContr (fiber f y))
+isPropisEquiv f = isPropFun λ b → isPropIsContr
+-- ? =====
+```
+
 If two propositions imply each other, then they are in fact
 isomorphic. This is known as "proposition extensionality".
-
+-- ! Homework
 ```
 propExt : isProp A → isProp B
         → (A → B) → (B → A)
@@ -699,4 +706,4 @@ isPropΣ : {A : Type ℓ} {B : A → Type ℓ'}
 isPropΣ q p (a1 , b1) (a2 , b2) i =
   q a1 a2 i , ∀isProp→isPred p a1 a2 (q a1 a2) b1 b2 i
 ```
- 
+  
