@@ -44,7 +44,7 @@ private
     x ≡⟨ q ⟩
     y ≡⟨ r ⟩
     z ∎
-
+  -- ? Not really sure yet
   example2 : (f : A → B) (g : B → A)
            → (η : (x : A) → x ≡ g (f x))
            → (ε : (y : B) → f (g y) ≡ y)
@@ -70,8 +70,9 @@ Recall that when thinking of a type `A` as a proposition, an element
 `A`, we only care about whether `A` has an element at all, whereas for
 data types, it matters which particular element we have. We turn this
 observation into a definition: propositions are types which have at
-most one element. In other words, a type is a proposition when we can
-give a path between any two elements.
+most one element. 
+-- * In other words, a type is a proposition when we can
+-- * give a path between any two elements.
 
 ```
 isProp : Type ℓ → Type ℓ
@@ -140,7 +141,7 @@ has an element, then it is contractible.
 ```
 Prop-with-point-isContr : isProp A → A → isContr A
 -- Exercise:
-Prop-with-point-isContr p a = {!!}
+Prop-with-point-isContr p a = a , (p a)
 ```
 
 We can go the other way too. If, whenever `A` has an element, it has a
@@ -149,13 +150,21 @@ unique element, then it has at most one element.
 ```
 isContr-prop-with-point : (A → isContr A) → isProp A
 -- Exercise:
-isContr-prop-with-point c x y = {!!}
+isContr-prop-with-point c x y = 
+  let c₀ = fst (c x)  -- ? No need for type signature (which is needed for 'where')
+      contract = snd (c x)
+  in
+    x ≡⟨ sym (contract x) ⟩ 
+    c₀ ≡⟨ contract y ⟩ 
+    y ∎
 ```
 
 More interestingly, we can show that being contractible is a
 proposition. That is, `isContr A` is a proposition for any type `A`:
 the proposition that `A` has a unique element.
 
+-- ! Ok a bit too fast there
+-- ! ===========
 The proof is a bit tricky. Suppose we have two elements `(c0, h0)` and
 `(c1, h1)` of `isContr A`, seeking to give a path `(c0, h0) ≡ (c1, h1)`.
 As these are pairs, it suffices to give two paths, one in the first
@@ -181,7 +190,7 @@ the following cube:
         ^       |           ^       | h0 y               ^   j
         |       |           |       |                  k | /
         |       |           |       |                    ∙ — >
-        |       |           |       |                      i
+ h0 c0? |       |           |       |                      i
         |      c0 - - - - - | - - > c0
         |     /             |     /
         |   /               |   /
@@ -228,11 +237,12 @@ isProp→SquareP {A = A} isPropB {a = a} r s t u i j =
            ; k (j = i1) → isPropB i i1 (base i i1) (s i) k
         }) (base i j) where
     base : (i j : I) → A i j
-    base i j = {!!}
+    base i j = transport (λ k → A (k ∧ i) (k ∧ j)) a
 
 isPropIsProp : isProp (isProp A)
 isPropIsProp isProp1 isProp2 i a b = isProp→SquareP (λ _ _ → isProp1) refl refl (isProp1 a b) (isProp2 a b) i
 ```
+-- ! ===========
 
 ## Closure Properties of Propositions
 
@@ -689,3 +699,4 @@ isPropΣ : {A : Type ℓ} {B : A → Type ℓ'}
 isPropΣ q p (a1 , b1) (a2 , b2) i =
   q a1 a2 i , ∀isProp→isPred p a1 a2 (q a1 a2) b1 b2 i
 ```
+ 
