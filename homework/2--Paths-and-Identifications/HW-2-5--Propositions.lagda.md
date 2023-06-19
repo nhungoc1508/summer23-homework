@@ -1,5 +1,6 @@
 # Homework 2-5: Propositions
 ```
+{-# OPTIONS --allow-unsolved-metas #-}
 module homework.2--Paths-and-Identifications.HW-2-5--Propositions where
 
 open import Cubical.Data.Sigma.Base using (Σ ; _×_)
@@ -595,6 +596,16 @@ With this definition of proposition, we can define a good notion of
 pairs `Σ[ a ∈ A ] B a` whose elements are pairs `(a , b)` where
 `a : A` and `b : B a` is a witness that `B` is true of `a`.
 
+```
+isPropisEvenP : (n : ℕ) → isProp (isEvenP n)
+isPropisEvenP zero = isProp⊤
+isPropisEvenP (suc zero) = isProp∅
+isPropisEvenP (suc (suc n)) = isPropisEvenP n
+
+Evens : Type
+Evens = Σ[ n ∈ ℕ ] isEvenP n
+```
+
 The main lemma to prove about subtypes is that they have the same
 paths as the types they came from. That is, `(a1 , b1) ≡ (a2 , b2)` is
 equivalent to `a1 ≡ a2` whenever `B a` is always a proposition.  To
@@ -632,10 +643,12 @@ isPred→∀isProp p a b1 b2 = p a a refl b1 b2
 Now the main lemma.
 
 ```
+-- ! ============== Starting here
 Σ≡PropIso : {A : Type ℓ} {B : A → Type ℓ'}
             (p : isPred B)
             (x y : Σ A B)
           → Iso (fst x ≡ fst y) (x ≡ y)
+-- Example: even numbers are equal when they are equal as numbers
 Σ≡PropIso {A = A} {B = B} p x y = iso to (cong fst) to-fro fro-to
   where
     to : fst x ≡ fst y → x ≡ y
@@ -651,7 +664,8 @@ Now the main lemma.
     fro-to e i j = e j
 ```
 
-It will also be useful have an inverse to `isPred→∀isProp`, so that we can interconvert freely between these two notions. To go the
+It will also be useful have an inverse to `isPred→∀isProp`, so that
+we can interconvert freely between these two notions. To go the
 other way, we need a few useful library functions which convert
 paths-over-paths (in `PathP`) to paths starting at a transport. This
 will give us a good opportunity to revisit `transp`.
@@ -726,7 +740,7 @@ b2`. So we will ask for `transp` to be constant when `i = i1`.
 
 ```
   fromPathP : PathP B b1 b2 → transport (λ i → B i) b1 ≡ b2
-  fromPathP p i = transp (λ j → B (i ∨ j)) i (p i)
+  fromPathP p j = transp (λ i → B (j ∨ i)) j (p j)
 ```
 
 With these functions in hand, we can turn a family of propositions
