@@ -366,10 +366,16 @@ isContrRetract :
   → isContr B → isContr A
 -- Exercise
 fst (isContrRetract f g h (center , contr)) = g center
-snd (isContrRetract f g h (center , contr)) x i = 
-  hcomp (λ { j (i = i0) → g center 
-           ; j (i = i1) → h x j }) 
-        (g (contr (f x) i))
+-- ? My solution
+-- snd (isContrRetract f g h (center , contr)) x i =
+--   hcomp (λ { j (i = i0) → g center 
+--            ; j (i = i1) → h x j }) 
+--         (g (contr (f x) i))
+-- ? Solution in class
+snd (isContrRetract f g h (center , contr)) x = 
+  g center ≡⟨ cong g (contr (f x)) ⟩
+  g (f x) ≡⟨ h x ⟩
+  x ∎
 ```
 
 ## Propositional Truncation
