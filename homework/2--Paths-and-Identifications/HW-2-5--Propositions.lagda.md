@@ -3,8 +3,9 @@
 module homework.2--Paths-and-Identifications.HW-2-5--Propositions where
 
 open import Cubical.Data.Sigma.Base using (Σ ; _×_)
+open import Cubical.Foundations.Function using (_∘_; _$_)
 
-open import homework.1--Type-Theory.HW-1-1--Types-and-Functions
+open import homework.1--Type-Theory.HW-1-1--Types-and-Functions hiding (_∘_)
 open import homework.1--Type-Theory.HW-1-2--Inductive-Types
 open import homework.1--Type-Theory.HW-1-3--Propositions-as-Types hiding (¬_)
 open import homework.2--Paths-and-Identifications.HW-2-1--Paths
@@ -396,6 +397,7 @@ data ∃_ (A : Type ℓ) : Type ℓ where
   ∣_∣ : A → ∃ A   -- Given an element of `A`, we can prove that
                   -- there is an element of `A`.
   squash : (x y : ∃ A) → x ≡ y
+  -- Alt: isProp (∃ A)
 ```
 
 The first, written `|_| : A → ∃ A`, says that to prove that there
@@ -420,9 +422,9 @@ the norm of a vector or operator. We'll record it here anyway.
 ```
 
 The recursion principle for `∃ A` says that to prove that `∃ A`
-implies some proposition `P`, it suffices to assume we have an actual
-element `a : A` and then prove `P`. That is, given a function `A → P`,
-we can get a function (implication) `∃ A → P`, whenever `P` is a
+implies some proposition `P`, -- * it suffices to assume we have an actual
+-- * element `a : A` and then prove `P`. That is, given a function `A → P`,
+-- * we can get a function (implication) `∃ A → P`, whenever `P` is a
 proposition.
 
 ```
@@ -434,20 +436,31 @@ proposition.
 ```
 
 `∃` should be a "functor", that is, we should be able to go from
-functions between types to functions between their truncations. If we have a function from `A` to `B`, then if `A` has an element, `B` also has an element.
+functions between types to functions between their truncations.
+If we have a function from `A` to `B`, then if `A` has an element,
+`B` also has an element.
 
 ```
 ∃-map : (A → B) → (∃ A → ∃ B)
 -- Exercise
-∃-map f = {!!}
+-- ? Pattern matching
+∃-map f ∣ x ∣ = ∣ f x ∣
+∃-map f (squash x y i) = squash (∃-map f x) (∃-map f y) i
+-- ? Recursion principle
+-- ∃-map f = ∃-rec isProp-∃ (∣_∣ ∘ f)
 ```
 
 When `P` is already a proposition, truncating it should do nothing:
 
 ```
+-- ? Recall
+-- propExt : isProp A → isProp B
+--         → (A → B) → (B → A)
+--         → Iso A B
+
 isProp→equiv∃ : isProp P → Iso P (∃ P)
 -- Exercise
-isProp→equiv∃ isPropP = {!   !}
+isProp→equiv∃ isPropP = propExt isPropP isProp-∃ ∣_∣ λ x → ∃-rec isPropP (λ y → y) x
 ```
 
 If `P : A → Type` is a family of propositions on `A` --- that is, a
@@ -728,4 +741,4 @@ isPropΣ : {A : Type ℓ} {B : A → Type ℓ'}
 isPropΣ q p (a1 , b1) (a2 , b2) i =
   q a1 a2 i , ∀isProp→isPred p a1 a2 (q a1 a2) b1 b2 i
 ```
-   
+     
