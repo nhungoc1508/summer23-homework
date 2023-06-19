@@ -298,8 +298,8 @@ propExt : isProp A → isProp B
 -- Exercise
 Iso.fun (propExt isPropA isPropB f g) = f
 Iso.inv (propExt isPropA isPropB f g) = g
-Iso.rightInv (propExt isPropA isPropB f g) b = sym (isPropB b (f (g b)))
-Iso.leftInv (propExt isPropA isPropB f g) a = sym (isPropA a (g (f a)))
+Iso.rightInv (propExt isPropA isPropB f g) b = isPropB (f (g b)) b
+Iso.leftInv (propExt isPropA isPropB f g) a = isPropA (g (f a)) a
 ```
 
 We could in fact show that `A iffP B` is isomorphic to `Iso A B`.
@@ -460,7 +460,7 @@ When `P` is already a proposition, truncating it should do nothing:
 
 isProp→equiv∃ : isProp P → Iso P (∃ P)
 -- Exercise
-isProp→equiv∃ isPropP = propExt isPropP isProp-∃ ∣_∣ λ x → ∃-rec isPropP (λ y → y) x
+isProp→equiv∃ isPropP = propExt isPropP isProp-∃ ∣_∣ (∃-rec isPropP (λ p → p))
 ```
 
 If `P : A → Type` is a family of propositions on `A` --- that is, a
@@ -503,6 +503,20 @@ there exists an element in `A ⊎ B`.
 ```
 _orP_ : Type ℓ → Type ℓ' → Type _
 A orP B = ∃ (A ⊎ B)
+
+orP-ump : {C : Type ℓ} (isPropC : isProp C) 
+          → Iso (A orP B → C) ((A → C) × (B → C)) 
+orP-ump isPropC = {!  !}
+
+BAut : (X : Type ℓ) (x : X) → Type ℓ
+BAut X x = Σ[ y ∈ X ] ∃ (x ≡ y)
+-- singl x = Σ[ y ∈ X ] (x ≡ y)
+
+TwoElementSet : Type _
+TwoElementSet = BAut _ Bool -- Σ[ F ∈ Type] ∃ (Bool ≡ F)
+
+TotallyOrderedTwoElementSet : Type _
+TotallyOrderedTwoElementSet = Σ[ F ∈ Type ] (Bool ≡ F) -- singl
 ```
 
 Challenge:
