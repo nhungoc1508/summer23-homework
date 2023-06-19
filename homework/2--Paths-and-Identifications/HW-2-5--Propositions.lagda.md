@@ -295,10 +295,10 @@ propExt : isProp A → isProp B
         → (A → B) → (B → A)
         → Iso A B
 -- Exercise
-Iso.fun (propExt isPropA isPropB f g) = {!!}
-Iso.inv (propExt isPropA isPropB f g) = {!!}
-Iso.rightInv (propExt isPropA isPropB f g) b = {!!}
-Iso.leftInv (propExt isPropA isPropB f g) a = {!!}
+Iso.fun (propExt isPropA isPropB f g) = f
+Iso.inv (propExt isPropA isPropB f g) = g
+Iso.rightInv (propExt isPropA isPropB f g) b = sym (isPropB b (f (g b)))
+Iso.leftInv (propExt isPropA isPropB f g) a = sym (isPropA a (g (f a)))
 ```
 
 We could in fact show that `A iffP B` is isomorphic to `Iso A B`.
@@ -321,7 +321,7 @@ The "and" of two proposition `A` and `B` is the type of pairs `A × B`.
 ```
 isProp× : isProp A → isProp B → isProp (A × B)
 -- Exercise
-isProp× pA pB (a1 , b1) (a2 , b2) i = {!!}
+isProp× pA pB (a1 , b1) (a2 , b2) i = pA a1 a2 i , pB b1 b2 i
 ```
 
 Similarly to `→`, if `A` and `B` are true (contracible), then `A × B` should
@@ -335,6 +335,16 @@ snd (isContr× (cA , hA) (cB , hB)) (a , b) i = (hA a i) , (hB b i)
 One last useful closure condition: if `A` is a retract of `B`, then in
 some sense `A` is a continuous shrinking of `B`. And so if `B` is a
 proposition, then `A` must be too:
+
+-- ? Square construction
+
+    x             y
+    ^             ^
+    |             |
+h x |             | h y
+    |             |
+    -------------->
+ g (f x)        g (f y)  
 
 ```
 isPropRetract :
@@ -355,8 +365,11 @@ isContrRetract :
   → (h : retract f g)
   → isContr B → isContr A
 -- Exercise
-fst (isContrRetract f g h (center , contr)) = {!!}
-snd (isContrRetract f g h (center , contr)) x = {!!}
+fst (isContrRetract f g h (center , contr)) = g center
+snd (isContrRetract f g h (center , contr)) x i = 
+  hcomp (λ { j (i = i0) → g center 
+           ; j (i = i1) → h x j }) 
+        (g (contr (f x) i))
 ```
 
 ## Propositional Truncation
@@ -709,4 +722,4 @@ isPropΣ : {A : Type ℓ} {B : A → Type ℓ'}
 isPropΣ q p (a1 , b1) (a2 , b2) i =
   q a1 a2 i , ∀isProp→isPred p a1 a2 (q a1 a2) b1 b2 i
 ```
-  
+   
