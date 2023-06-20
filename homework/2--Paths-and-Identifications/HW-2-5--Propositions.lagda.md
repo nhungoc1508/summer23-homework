@@ -4,9 +4,9 @@
 module homework.2--Paths-and-Identifications.HW-2-5--Propositions where
 
 open import Cubical.Data.Sigma.Base using (Σ ; _×_)
-open import Cubical.Foundations.Function using (_∘_; _$_)
+open import Cubical.Foundations.Function using (_∘_; _$_; curry; uncurry)
 
-open import homework.1--Type-Theory.HW-1-1--Types-and-Functions hiding (_∘_)
+open import homework.1--Type-Theory.HW-1-1--Types-and-Functions hiding (_∘_; uncurry; curry)
 open import homework.1--Type-Theory.HW-1-2--Inductive-Types
 open import homework.1--Type-Theory.HW-1-3--Propositions-as-Types hiding (¬_)
 open import homework.2--Paths-and-Identifications.HW-2-1--Paths
@@ -525,15 +525,38 @@ Challenge:
 -- propExt : isProp A → isProp B
 --         → (A → B) → (B → A)
 --         → Iso A B
+-- ∃-rec : (isProp P)
+--       → (A → P)
+--       → (∃ A → P)
 
-∃-Idem-×-L-Iso : Iso (∃ (∃ A) × B) (∃ A × B)
-∃-Idem-×-L-Iso = propExt isProp-∃ isProp-∃ (∃-rec {!   !} {!   !}) {!   !}
+∃-Idem-×-L-Iso : Iso (∃ ((∃ A) × B)) (∃ A × B)
+∃-Idem-×-L-Iso = 
+  propExt isProp-∃ 
+          isProp-∃ 
+          (∃-rec isProp-∃ lemma)
+          -- (∃-map λ x → ∣ fst x ∣ , (snd x)) -- ? my solution
+          (∃-rec isProp-∃ λ { (a , b) → ∣ ∣ a ∣ , b ∣ })
+  where
+      lemma : (∃ A) × B → ∃ (A × B)
+      lemma (∣ x ∣ , b) = ∣ x , b ∣  
+      lemma (squash x x1 i , b) = squash (lemma (x , b)) (lemma (x1 , b)) i
 
-∃-Idem-×-R-Iso : Iso (∃ A × (∃ B)) (∃ A × B)
-∃-Idem-×-R-Iso = {!!}
+∃-Idem-×-R-Iso : Iso (∃ A × (∃ B)) (∃ (A × B))
+-- ∃-Idem-×-R-Iso = propExt isProp-∃ isProp-∃ (∃-map (λ x → fst x , {! snd x  !})) (∃-map λ x → fst x , ∣ snd x ∣)
+∃-Idem-×-R-Iso = {!   !}
 
-∃-×-Iso : Iso ((∃ A) × (∃ B)) (∃ A × B)
-∃-×-Iso = {!!}
+∃-×-Iso : Iso ((∃ A) × (∃ B)) (∃ (A × B))
+-- ∃-×-Iso = propExt (isProp× isProp-∃ isProp-∃) isProp-∃ (λ x → {!  !}) (∃-rec (isProp× isProp-∃ isProp-∃) (λ x → ∣ fst x ∣ , ∣ snd x ∣))
+∃-×-Iso = 
+  propExt (isProp× isProp-∃ isProp-∃) 
+          isProp-∃ 
+          (uncurry (∃-rec (isProp→ isProp-∃) 
+                          (λ a → ∃-rec isProp-∃ λ b → ∣ a , b ∣))) 
+          (∃-rec (isProp× isProp-∃ isProp-∃) (×map ∣_∣ ∣_∣))
+  where
+    ×map : {X X' : Type ℓ} {Y Y' : Type ℓ'} (f : X → X') (g : Y → Y')
+          → X × Y → X' × Y'
+    ×map f g (x , y) = (f x , g y)
 ```
 
 ## Decidable Types
@@ -580,7 +603,8 @@ Dec→Stable (yes x) = λ _ → x
 Dec→Stable (no x) = λ f → ∅-rec (f x)
 
 Dec-Idem : Dec (Dec A) → Dec A
-Dec-Idem = {!!}
+Dec-Idem (yes x) = x
+Dec-Idem (no ¬p) = {!  !}
 
 ∃-Dec : Iso (Dec (∃ A)) (∃ (Dec A))
 ∃-Dec = {!!}
@@ -773,4 +797,4 @@ isPropΣ : {A : Type ℓ} {B : A → Type ℓ'}
 isPropΣ q p (a1 , b1) (a2 , b2) i =
   q a1 a2 i , ∀isProp→isPred p a1 a2 (q a1 a2) b1 b2 i
 ```
-     
+        
