@@ -30,14 +30,21 @@ propositions --- specifically, the proposition that `x` equals `y`.
 
 ```
 isSetBool : (x y : Bool) → isProp (x ≡ y)
-isSetBool x y =
-  let ≡BoolPath≡ = sym $ isoToPath (≡Iso≡Bool x y)
-  in subst isProp ≡BoolPath≡ (isProp-≡Bool x y)
+-- isSetBool x y =
+--   let ≡BoolPath≡ = sym $ isoToPath (≡Iso≡Bool x y)
+--   in subst isProp ≡BoolPath≡ (isProp-≡Bool x y)
+isSetBool x y = 
+  let 
+    f = Iso.fun (≡Iso≡Bool x y)
+    g = Iso.inv (≡Iso≡Bool x y)
+    r = Iso.leftInv (≡Iso≡Bool x y)
+  in isPropRetract f g r (isProp-≡Bool x y)
 
 isSetℕ : (x y : ℕ) → isProp (x ≡ y)
 isSetℕ x y =
-  let ≡ℕPath≡ = sym $ isoToPath (≡Iso≡ℕ x y)
+  let ≡ℕPath≡ = sym $ isoToPath (≡Iso≡ℕ x y) -- * (x ≡ℕ y) ≡ (x ≡ y)
   in subst isProp ≡ℕPath≡ (isProp-≡ℕ x y)
+  -- * isProp-≡ℕ : (n m : ℕ) → isProp (n ≡ℕ m)
 ```
 
 We will call a type `A` for which `x ≡ y` is a proposition for any `x`
@@ -82,7 +89,7 @@ isSet→ pB f g h1 h2 i j a = pB (f a) (g a) (λ i₁ → h1 i₁ a) (λ i₂ �
 
 We can also show that any proposition is a set. This may sound a bit
 odd, but we can think of any proposition `P` as a set with at most one
-element --- it is, after all, a type with at most one element.
+element - it is, after all, a type with at most one element.
 
 Hint: Here is the cube we want to fill.
 
@@ -112,6 +119,13 @@ isProp→isSet-faces h a b p q i j k (j = i1) = h a b k
 isProp→isSet : isProp A → isSet A
 -- Exercise
 isProp→isSet h a b p q i j = hcomp (isProp→isSet-faces h a b p q i j) a
+
+isProp→isSet' : isProp A → isSet A
+isProp→isSet' h a b = 
+  let
+    isContrA = Prop-with-point-isContr h a
+    isContra≡b = isContrisContr≡ isContrA a b 
+  in isContr→isProp isContra≡b
 ```
 
 We can use the fact that propositions are closed under retract to
@@ -152,8 +166,8 @@ Second, we will need to import a function from the library, which we
 will inline (so that it works with our homebrew definition of
 Iso). Recall from 2-5 the functions `toPathP` and `fromPathP`:
 
-* `toPathP : transport (λ j → B j) b1 ≡ b2 → PathP B b1 b2`
-* `fromPathP : PathP B b1 b2 → transport (λ i → B i) b1 ≡ b2`
+-- * `toPathP : transport (λ j → B j) b1 ≡ b2 → PathP B b1 b2`
+-- * `fromPathP : PathP B b1 b2 → transport (λ i → B i) b1 ≡ b2`
 
 We will show that these are an isomorphism. First, we can in fact give
 a quite simple path (in `Type`) between the types
@@ -356,6 +370,7 @@ show that `S¹` is also not a set.
 double-cover : S¹ → Type
 double-cover base = Bool
 double-cover (loop i) = isoToPath not-Iso i
+-- ? imagine the Mobius strip
 
 ¬isSet-S¹ : ¬ isSet S¹
 -- Exercise
