@@ -175,7 +175,8 @@ Try it yourself:
     → transport (λ i → (A i → A i) → A i) y
     ≡ λ n → 
         let
-            n' = λ x → transport {!   !} n
+            -- n' = λ x → transport (λ i → {!   !}) n
+            n' = {!   !}
         in transport (λ i → A i) (y n')
   _ = refl
 ```
@@ -446,3 +447,4 @@ isEquivAddℤ' (negsuc n) = isEquivTransport (sub-n-Path (suc n))
 
 isEquivAddℤ : (m : ℤ) → isEquiv (λ n → n +ℤ m)
 isEquivAddℤ = subst (λ add → (m : ℤ) → isEquiv (λ n → add n m)) +ℤ'≡+ℤ isEquivAddℤ'
+ 
