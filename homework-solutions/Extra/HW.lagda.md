@@ -63,51 +63,13 @@ h'Sides f g β i j (i = i0) = sym β j
 h'Sides f g β i j (i = i1) = sym β j
 
 lemma2Faces : {X : Type ℓ} (f g : S¹ → X) 
-              → (β : f base ≡ g base) 
+              → (β : f base ≡ g base)
+              → (p : Square (cong f loop) (λ j → h' f g β (loop j)) refl refl )
               → (i : I) → (j : I) → I → Partial (∂ i ∨ ∂ j) X
-lemma2Faces f g β i j k (i = i0) = 
-    hfill (h'Sides f g β j) 
-          (inS (g (loop j))) k
--- hfill (h'Sides f g β j) (inS (g base)) k
-lemma2Faces f g β i j k (i = i1) = g (loop j)
--- HW 2.4: Square p refl refl (sym p) = p i j = p (j ∧ (~ i))
-lemma2Faces f g β i j k (j = i0) = (sym β) (k ∧ (~ i))
-lemma2Faces f g β i j k (j = i1) = (sym β) (k ∧ (~ i))
-
-rightFaceSides : {X : Type ℓ} (f g : S¹ → X) 
-                 → (β : f base ≡ g base)
-                 → (i j : I) → Partial (∂ i) X
-rightFaceSides f g β i j (i = i0) = β j
-rightFaceSides f g β i j (i = i1) = β j
-
-frontBackFaceSides : {X : Type ℓ} (f g : S¹ → X) 
-                     → (β : f base ≡ g base)
-                     → (i j : I) → Partial (∂ i) X
-frontBackFaceSides f g β i j (i = i0) = sym β j
-frontBackFaceSides f g β i j (i = i1) = β j
-
-baseFaceSides : {X : Type ℓ} (f g : S¹ → X)
-                → (β : f base ≡ g base)
-                → (i j : I) → Partial (∂ i) X
-baseFaceSides f g β i j (i = i0) = g (loop j)
-baseFaceSides f g β i j (i = i1) = f (loop j)
-
-lemma2FacesAlt : {X : Type ℓ} (f g : S¹ → X) 
-                 → (β : f base ≡ g base)
-                 → (i : I) → (j : I) → I → Partial (∂ i ∨ ∂ j) X
-lemma2FacesAlt f g β i j k (i = i0) = hfill (h'Sides f g β j) (inS (g (loop j))) k
-lemma2FacesAlt f g β i j k (i = i1) = hfill (rightFaceSides f g β j) (inS (f (loop j))) k
-lemma2FacesAlt f g β i j k (j = i0) = hfill (frontBackFaceSides f g β i) (inS (sym β i)) k
-lemma2FacesAlt f g β i j k (j = i1) = hfill (frontBackFaceSides f g β i) (inS (sym β i)) k
-
-lemma2FacesAlt' : {X : Type ℓ} (f g : S¹ → X) 
-                 → (β : f base ≡ g base)
-                 → (p : Square (cong f loop) (λ j → h' f g β (loop j)) refl refl )
-                 → (i : I) → (j : I) → I → Partial (∂ i ∨ ∂ j) X
-lemma2FacesAlt' f g β p i j k (i = i0) = p (~ k) j
-lemma2FacesAlt' f g β p i j k (i = i1) = hfill (h'Sides f g β j) (inS (g (loop j))) (~ k )
-lemma2FacesAlt' f g β p i j k (j = i0) = β (i ∧ k) 
-lemma2FacesAlt' f g β p i j k (j = i1) = β (i ∧ k) 
+lemma2Faces f g β p i j k (i = i0) = p (~ k) j
+lemma2Faces f g β p i j k (i = i1) = hfill (h'Sides f g β j) (inS (g (loop j))) (~ k )
+lemma2Faces f g β p i j k (j = i0) = β (i ∧ k) 
+lemma2Faces f g β p i j k (j = i1) = β (i ∧ k) 
 
 
 lemma2 : {X : Type ℓ} (f g : S¹ → X) 
@@ -115,6 +77,6 @@ lemma2 : {X : Type ℓ} (f g : S¹ → X)
          → (p : Square (cong f loop) ((λ j → h' f g β (loop j))) refl refl )
          → (f ≡ g)
 lemma2 f g β p i base = β i
-lemma2 f g β p i (loop j) = hcomp (lemma2FacesAlt' f g β p i j) 
+lemma2 f g β p i (loop j) = hcomp (lemma2Faces f g β p i j) 
                                   (h' f g β (loop j))
 ```
