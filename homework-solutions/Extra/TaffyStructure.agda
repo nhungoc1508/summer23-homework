@@ -1,4 +1,4 @@
-module homework-solutions.Extra.NewNew where
+module homework-solutions.Extra.TaffyStructure where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.GroupoidLaws
@@ -50,9 +50,9 @@ circToBouq (suc n) s = circleHelper n (suc n) ≤-refl s
 BouquetInstance : ∀ n → TaffyStructure n (Bouquet (Fin n))
 BouquetInstance n = circToBouq n , λ x y → circToBouq n y
 
-h' : (n : ℕ) → ((c₁ , c₂) : TaffyStructure n (Bouquet (Fin n))) 
-   → {! !} → Type
-h' n (c₁ , c₂) = {! BouquetInstance n .fst !}
+h' : (n : ℕ) → (t : TaffyStructure n (Bouquet (Fin n))) 
+   → (S¹ → Bouquet (Fin n)) → {!   !} → Type
+h' n (c₁ , c₂) x = {!   !}
 
 tmp = {! BouquetInstance zero  !}
 
